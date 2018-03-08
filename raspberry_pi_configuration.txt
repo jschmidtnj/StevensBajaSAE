@@ -1,0 +1,22 @@
+Configure Touchscreen
+https://www.makeuseof.com/tag/setup-raspberry-pi-touchscreen/
+
+Change brightness and turn on / off:
+https://raspberrypi.stackexchange.com/questions/46225/adjusting-the-brightness-of-the-official-touchscreen-display#46229
+
+send data to db:
+https://www.youtube.com/watch?v=9Pde26llc7s
+
+
+Rotate Screen 90 degrees:
+https://www.raspberrypi.org/forums/viewtopic.php?f=108&t=120793&start=50
+
+sudo apt-get install xinput
+sudo nano /boot/config.txt
+display_rotate=1
+sudo nano /home/pi/Desktop/fliptouch.sh
+xinput --set-prop 'FT5406 memory based driver' 'Coordinate Transformation Matrix' 0 1 0 -1 0 1 0 0 1
+sudo chmod 777 /home/pi/Desktop/fliptouch.sh
+sudo nano ~/.config/lxsession/LXDE-pi/autostart
+@/home/pi/Desktop/fliptouch.sh
+sudo reboot

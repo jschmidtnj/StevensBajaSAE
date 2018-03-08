@@ -1,0 +1,5 @@
+raspberry pi hostname (hostname -I) = 155.246.215.148
+change configuration settings: https://stackoverflow.com/questions/41318597/ssh-connection-refused-on-raspberry-pi
+
+send to pi Desktop from ubuntu desktop:
+scp filename.txt pi@155.246.215.148:Desktop/
