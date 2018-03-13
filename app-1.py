@@ -12,16 +12,31 @@ ser.flushInput()
 
 class StevensBajaSAE(tk.Frame):
 	"""This is the class for the application window, the app being the tkinter setup"""
+
+	def new_lap(self, master):
+		self.previous_laps.append(self.current_lap)
+		self.current_lap = 0
+		self.sum_previous_laps = sum(self.previous_laps)
+
 	def refresh(self):
 		#refresh the data input
 		#input_data = ser.readline()
 		#print(input_data)
 		#necessary_variables:
-		current_time = time.time()
+		current_time = time.time() - self.initial_time
+		#if there are previous laps:
+		if self.previous_laps != []:
+			self.current_lap = current_time - self.sum_previous_laps
+			self.previous_lap_time.config(text='{:07.3f}'.format(self.previous_laps[len(self.previous_laps) - 1]))
+		#if there are no previous laps:
+		else:
+			self.current_lap = current_time
+			self.previous_lap_time.config(text='n/a')
+
+		self.total_time.config(text='{:07.3f}'.format(current_time))
+		self.lap_time.config(text='{:07.3f}'.format(self.current_lap))
+
 		#configure all of the new data input:
-		self.total_time.config(text='{:07.3f}'.format(current_time - self.initial_time))
-		self.lap_time.config(text='{:07.3f}'.format(current_time - self.initial_time + 5))
-		self.previous_lap_time.config(text='{:07.3f}'.format(current_time - self.initial_time + 10))
 
 		#refresh data:
 		self.master.after(5, self.refresh)
@@ -42,22 +57,35 @@ class StevensBajaSAE(tk.Frame):
 
 		#vars for widgets:
 		self.initial_time = time.time()
+		self.lap_count = 0
+		self.previous_laps = list()
+		self.current_lap = 0
+		self.sum_previous_laps = 0
 
 		#create the widgets:
+		#time widgets
 		self.total_time = Label(master, font = time_font, bg=time_background)
 		self.total_time_label = Label(master, font = time_label_font, bg=time_label_background, text = "Total Time Elapsed")
 		self.lap_time = Label(master, font = time_font, bg=time_background)
 		self.lap_time_label = Label(master, font = time_label_font, bg=time_label_background, text = "Current Lap Time")
 		self.previous_lap_time = Label(master, font = time_font, bg=time_background)
 		self.previous_lap_time_label = Label(master, font = time_label_font, bg=time_label_background, text = "Previous Lap Time")
+		#lap widget
+		self.new_lap_label = Label(master, font = time_label_font, bg=time_label_background, text = "New Lap")
+		self.new_lap_button = tk.Button(master, text="Click Here", font = time_font, bg = time_label_background)
+		#when button is pressed go to the new_lap function
+		self.new_lap_button.bind('<ButtonPress>', self.new_lap)
+		self.lap_count = Label(master, font = time_label_font, bg=time_label_background)
 
 		#place the widgets
 		self.total_time_label.grid(row=0, column=0, sticky=N+S+E+W)
 		self.total_time.grid(row=1, column=0, sticky=N+S+E+W)
 		self.lap_time_label.grid(row=0, column=1, sticky=N+S+E+W)
 		self.lap_time.grid(row=1, column=1, sticky=N+S+E+W)
-		self.previous_lap_time_label.grid(row=0, column=2, sticky=N+S+E+W)
-		self.previous_lap_time.grid(row=1, column=2, sticky=N+S+E+W)
+		self.new_lap_label.grid(row=0, column=2, sticky=N+S+E+W)
+		self.new_lap_button.grid(row=1, column = 2, sticky=N+S+E+W)
+		self.previous_lap_time_label.grid(row=0, column=3, sticky=N+S+E+W)
+		self.previous_lap_time.grid(row=1, column=3, sticky=N+S+E+W)
 
 		#allow for self resizing:
 		for x in range(Grid.grid_size(master)[0]):
