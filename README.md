@@ -27,3 +27,12 @@ The Amazon ec2 instance contains a copy of the mysql database found on the pi. I
 ## Comclusion
 
 Through using this new dash system, the Stevens Baja SAE team is able to provide real-time analysis of any problems in the car, as well as valuable data to show what the driver could do better when training. Data is stored redundantly, and everything about the system, from the analog output in the dash to the node.js-based website, can be fully customized. We believe this system will give the Stevens team the edge it needs to compete well this racing season.
+
+### Notes for Deployment
+
+git --config user.name "yourgithubusername"
+git --config user.email "yourgithubemail"
+git clone "http://github.com/jschmidtnj/StevensBajaSAE/"
+git add -A
+git commit -m "your commit message"
+git push origin master
