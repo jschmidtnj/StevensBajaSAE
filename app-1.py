@@ -38,34 +38,40 @@ class StevensBajaSAE(tk.Frame):
 
 		#add the needles:
 		#dial 1: speed:
-		speed = 50
+		speed = 60
 		max_speed = 120 #mph
 		min_speed = 0
-		dial_spacing =  math.pi / 3
+		#dial spacing is the radians of angle between the horizontal and the first zero
+		dial_spacing =  math.pi / 3 #make sure this is less than pi / 2
+		#this is the angle from the zero the dial is in (radians) 
 		radians_from_min = (speed / (max_speed - min_speed)) * ((2 * math.pi) - (2 *  dial_spacing))
+		#if less than pi / 2
 		if (radians_from_min + dial_spacing) <= (math.pi / 2):
 			phi = math.pi / 2 - dial_spacing - radians_from_min
-			delta_x = math.cos(phi) * dial_radius * -1
-			delta_y = math.sin(phi) * dial_radius * -1
+			delta_x = abs(math.cos(phi) * dial_radius) * -1
+			delta_y = abs(math.sin(phi) * dial_radius) * -1
+		#if less than pi
 		elif (radians_from_min + dial_spacing) <= (math.pi):
 			phi = radians_from_min + dial_spacing - (math.pi / 2)
-			delta_x = math.cos(phi) * dial_radius * -1
-			delta_y = math.sin(phi) * dial_radius * 1
+			delta_x = abs(math.cos(phi) * dial_radius) * -1
+			delta_y = abs(math.sin(phi) * dial_radius) * 1
+		#if less than 3 pi / 2
 		elif (radians_from_min + dial_spacing) <= (math.pi * 3 / 2):
 			phi = radians_from_min + dial_spacing - math.pi
-			delta_x = math.sin(phi) * dial_radius * 1
-			delta_y = math.cos(phi) * dial_radius * 1
+			delta_x = abs(math.sin(phi) * dial_radius) * 1
+			delta_y = abs(math.cos(phi) * dial_radius) * 1
+		#if less than the max point
 		else:
 			if (radians_from_min + dial_spacing) >= ((2 * math.pi) - dial_spacing):
-				delta_x = math.sin(dial_spacing) * dial_radius * 1
-				delta_y = math.cos(dial_spacing) * dial_radius * -1
+				delta_x = abs(math.sin(dial_spacing) * dial_radius) * 1
+				delta_y = abs(math.cos(dial_spacing) * dial_radius) * -1
 			else:
 				phi = radians_from_min + dial_spacing - (math.pi * 3 / 2)
-				delta_x = math.cos(phi) * dial_radius * 1
-				delta_y = math.sin(phi) * dial_radius * -1
+				delta_x = abs(math.cos(phi) * dial_radius) * 1
+				delta_y = abs(math.sin(phi) * dial_radius) * -1
 		speed_center_x = x0_dial1 + dial_radius
-		speed_center_y = y0_dial1 - dial_radius
-		master.create_line(speed_center_x + delta_x, speed_center_y + delta_y, speed_center_x, speed_center_y)
+		speed_center_y = y0_dial1 + dial_radius
+		master.create_line((speed_center_x + delta_x), (speed_center_y + delta_y), speed_center_x, speed_center_y)
 
 	def new_lap(self, master):
 		if self.first_new_lap_click == True:
