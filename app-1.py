@@ -2,6 +2,7 @@ import serial
 import math
 import sys
 import time
+from datetime import datetime
 import tkinter as tk
 from tkinter import *
 from tkinter.font import Font
@@ -13,83 +14,120 @@ ser.flushInput()
 
 class StevensBajaSAE(tk.Frame):
 	"""This is the class for the application window, the app being the tkinter setup"""
-
-	def build_fuel_gauge(tk.Frame):
-		return False
-
-	def build_dials(self, master):
+	def build_driving_mode_indicator(self, driving_mode):
 		#styling:
-		num_labels = 10
-		offset_ticks = 10 #px
-		offset_text = 20 #px
-		dial_spacing = (math.pi / 3) #should be less than pi / 2
-		dial_radius = 150 #px
+		main_label_font = Font(family="Arial", size=30)
+		secondary_label_font = Font(family="Arial", size=12)
+		offset_secondary_label = 35 #px
 		y_percent = 30 #y0 offset from the top
-		x_percent = 6 #x0 offset from the left
-		min_value_speed = 0
-		max_value_speed = 120
-		min_value_rpm = 0
-		max_value_rpm = 3000
+		x_percent = 0 #x0 offset to the left of the center
+
+		x0_main_label = (self.width * (.5 - x_percent / 100))
+		y0_main_label = self.height * (y_percent / 100)
+
+		#0 = forward, 1 = neutral, 2 = reverse
+		if driving_mode == 0:
+			#forward
+			driving_mode_text = "F"
+			secondary_label_1_text = "N"
+			secondary_label_2_text = "R"
+			secondary_label_1_offset_y = 1 * offset_secondary_label
+			secondary_label_2_offset_y = 2 * offset_secondary_label
+		elif driving_mode == 1:
+			#neutral
+			secondary_label_1_text = "F"
+			driving_mode_text = "N"
+			secondary_label_2_text = "R"
+			secondary_label_1_offset_y = -1 * offset_secondary_label
+			secondary_label_2_offset_y = 1 * offset_secondary_label
+		else:
+			#reverse
+			secondary_label_1_text = "F"
+			secondary_label_2_text = "N"
+			driving_mode_text = "R"
+			secondary_label_1_offset_y = -2 * offset_secondary_label
+			secondary_label_2_offset_y = -1 * offset_secondary_label
+
+		#create the main text:
+		(self.master).create_text(x0_main_label, y0_main_label, text=driving_mode_text, font=main_label_font)
+		(self.master).create_text(x0_main_label, y0_main_label + secondary_label_1_offset_y, text=secondary_label_1_text, font=secondary_label_font)
+		(self.master).create_text(x0_main_label, y0_main_label + secondary_label_2_offset_y, text=secondary_label_2_text, font=secondary_label_font)
+
+
+	def build_fuel_gauge(self, fuel_level):
+		#styling:
+		main_label = "Fuel Guage"
+		main_label_font = Font(family="Arial", size=20)
+		offset_main_label_x = 0 #px left
+		offset_main_label_y = 35 #px up
+		current_fuel_level_x_offset = 35 #px
+		current_fuel_level_indicator_font = Font(family="Arial", size=12)
+		text_label_font = Font(family="Arial", size=12)
+		tick_length = 10 #px
+		text_offset = 20 #px
+		num_labels = 3
+		background_guage_color = (192, 192, 192)
+		guage_green = (53, 134, 0)
+		guage_yellow = (210, 180, 1)
+		guage_red = (166, 0, 7)
+		num_labels = 3
+		offset_text = 20 #px
+		width_of_fuelguage = 600 #px
+		height_of_fuelguage = 100 #px
+		y_percent = 65 #y0 offset from the top
+		x_percent = 0 #x0 offset to the left of the center
 		
-		#Dials
-		width = master.winfo_width()
-		height = master.winfo_height()
-		x0_dial1 = width * (x_percent / 100)
-		y0_dial1 = height * (y_percent / 100)
-		x1_dial1 = x0_dial1 + (2 * dial_radius)
-		y1_dial1 = y0_dial1 + (2 * dial_radius)
-		x1_dial2 = width * ((100 - x_percent) / 100)
-		x0_dial2 = x1_dial2 - (2 * dial_radius)
-		y0_dial2 = height * (y_percent / 100)
-		y1_dial2 = y0_dial2 + (2 * dial_radius)
+		#background_guage
+		x0_background_guage = (self.width * (.5 - x_percent / 100)) - (width_of_fuelguage / 2)
+		y0_background_guage = self.height * (y_percent / 100)
+		x1_background_guage = (self.width * (.5 - x_percent / 100)) + (width_of_fuelguage / 2)
+		y1_background_guage = (self.height * (y_percent / 100)) + height_of_fuelguage
 
-		#create dials 1 and 2
-		master.create_oval(x0_dial1, y0_dial1, x1_dial1, y1_dial1)
-		master.create_oval(x0_dial2, y0_dial2, x1_dial2, y1_dial2)
+		#indicator_guage
+		x0_indicator_guage = (self.width * (.5 - x_percent / 100)) - (width_of_fuelguage / 2)
+		y0_indicator_guage = self.height * (y_percent / 100)
+		x1_indicator_guage = ((self.width * (.5 - x_percent / 100)) + (width_of_fuelguage / 2)) - ((1- (fuel_level / 100)) * width_of_fuelguage)
+		y1_indicator_guage = (self.height * (y_percent / 100)) + height_of_fuelguage
 
-		#add the needles: (x0_dial is the diagonal top left point when making the circle)
-		def create_needle(current_value, min_value, max_value, dial_spacing, x0_dial, y0_dial, dial_radius):
-			#this is the angle from the zero the dial is in (radians) 
-			radians_from_min = (current_value / (max_value - min_value)) * ((2 * math.pi) - (2 *  dial_spacing))
-			#if less than pi / 2
-			if (radians_from_min + dial_spacing) <= (math.pi / 2):
-				if radians_from_min <= 0:
-					delta_x = abs(math.sin(dial_spacing) * dial_radius) * -1
-					delta_y = abs(math.cos(dial_spacing) * dial_radius) * 1
-				else:
-					phi = (math.pi / 2) - dial_spacing - radians_from_min
-					delta_x = abs(math.cos(phi) * dial_radius) * -1
-					delta_y = abs(math.sin(phi) * dial_radius) * 1
-			#if less than pi
-			elif (radians_from_min + dial_spacing) <= (math.pi):
-				phi = radians_from_min + dial_spacing - (math.pi / 2)
-				delta_x = abs(math.cos(phi) * dial_radius) * -1
-				delta_y = abs(math.sin(phi) * dial_radius) * -1
-			#if less than 3 pi / 2
-			elif (radians_from_min + dial_spacing) <= (math.pi * 3 / 2):
-				phi = radians_from_min + dial_spacing - math.pi
-				delta_x = abs(math.sin(phi) * dial_radius) * 1
-				delta_y = abs(math.cos(phi) * dial_radius) * -1
-			#if less than the max point
-			else:
-				if (radians_from_min + dial_spacing) >= ((2 * math.pi) - dial_spacing):
-					delta_x = abs(math.sin(dial_spacing) * dial_radius) * 1
-					delta_y = abs(math.cos(dial_spacing) * dial_radius) * 1
-				else:
-					phi = radians_from_min + dial_spacing - (math.pi * 3 / 2)
-					delta_x = abs(math.cos(phi) * dial_radius) * 1
-					delta_y = abs(math.sin(phi) * dial_radius) * 1
-			center_point_x = x0_dial + dial_radius
-			center_point_y = y0_dial + dial_radius
-			master.create_line((center_point_x + delta_x), (center_point_y + delta_y), center_point_x, center_point_y)
-		#create the needle for the dials:
-		#dial 1: speed:
-		#dial spacing is the radians of angle between the horizontal and the first zero, make sure it is less than pi / 2
-		create_needle(self.speed, min_value_speed, max_value_speed, dial_spacing, x0_dial1, y0_dial1, dial_radius)
-		#dial 2: rpm
-		create_needle(self.rpm, min_value_rpm, max_value_rpm, dial_spacing, x0_dial2, y0_dial2, dial_radius)
+		#Set the background colors:
+		background_guage_color = "#%02x%02x%02x" % background_guage_color
 
-		def create_tickmarks_and_labels(min_value, max_value, dial_spacing, x0_dial, y0_dial, dial_radius, offset_ticks, offset_text):
+		if fuel_level > 50:
+			#make the guage green
+			self.fuel_guage_color = "#%02x%02x%02x" % guage_green
+		elif fuel_level > 25:
+			#make the guage yellow
+			self.fuel_guage_color = "#%02x%02x%02x" % guage_yellow
+		else:
+			#make the guage red
+			self.fuel_guage_color = "#%02x%02x%02x" % guage_red
+
+		#create background guage:
+		(self.master).create_rectangle(x0_background_guage, y0_background_guage, x1_background_guage, y1_background_guage, fill=background_guage_color)
+		#create indicator guage:
+		(self.master).create_rectangle(x0_indicator_guage, y0_indicator_guage, x1_indicator_guage, y1_indicator_guage, fill=self.fuel_guage_color)
+
+		#create the labels and tickmarks:
+		spacing = (width_of_fuelguage / num_labels)
+		difference_in_value = (100 / num_labels)
+		for i in range(num_labels + 1):
+			#current tick
+			current_tick_label = difference_in_value * i
+			#offset from x0 y0
+			delta_x = i * spacing
+			delta_y = height_of_fuelguage #ticks below the guage
+			#create the ticks
+			(self.master).create_line((x0_background_guage + delta_x), (y0_background_guage + delta_y), (x0_background_guage + delta_x), (y0_background_guage + delta_y + tick_length))
+			#create the text
+			(self.master).create_text((x0_background_guage + delta_x), (y0_background_guage + delta_y + text_offset), text=("{0:.0f}".format(current_tick_label)), font=text_label_font)
+
+		#create current level label
+		(self.master).create_text((x1_indicator_guage + current_fuel_level_x_offset), (y0_background_guage + (height_of_fuelguage / 2)), text=("{0:.02f}%".format(self.fuel_level)), font=current_fuel_level_indicator_font)
+
+		#create the main label
+		(self.master).create_text((x0_background_guage + (width_of_fuelguage / 2) - offset_main_label_x), (y0_background_guage - offset_main_label_y), text=main_label, font=main_label_font)
+
+	def create_tickmarks_and_labels(self, min_value, max_value, dial_spacing, x0_dial, y0_dial, dial_radius, offset_ticks, offset_text, num_labels, text_label_font):
 			#this method makes the tickmarks and labels. labels are defined by the x and y offsets * some value constant * -1
 			radians_between_lines = ((2 * math.pi) - (2 * dial_spacing)) / num_labels
 			for i in range(num_labels + 1):
@@ -150,16 +188,127 @@ class StevensBajaSAE(tk.Frame):
 				center_point_x = x0_dial + dial_radius
 				center_point_y = y0_dial + dial_radius
 				#create the tick marks
-				master.create_line((center_point_x + delta_x_on_circle), (center_point_y + delta_y_on_circle), (center_point_x + delta_x_offset_ticks), (center_point_y + delta_y_offset_ticks))
+				(self.master).create_line((center_point_x + delta_x_on_circle), (center_point_y + delta_y_on_circle), (center_point_x + delta_x_offset_ticks), (center_point_y + delta_y_offset_ticks))
 				#create the text
-				master.create_text((center_point_x + delta_x_offset_text), (center_point_y + delta_y_offset_text), text=("{0:.0f}".format(current_tick_label)))
+				(self.master).create_text((center_point_x + delta_x_offset_text), (center_point_y + delta_y_offset_text), text=("{0:.0f}".format(current_tick_label)), font=text_label_font)
+
+	#add the needles: (x0_dial is the diagonal top left point when making the circle)
+	def create_needle(self, current_value, min_value, max_value, dial_spacing, x0_dial, y0_dial, dial_radius, thickness, name_of_guage, font_main_label, offset_main_label_x, offset_main_label_y):
+		#this is the angle from the zero the dial is in (radians) 
+		radians_from_min = (current_value / (max_value - min_value)) * ((2 * math.pi) - (2 *  dial_spacing))
+		#if less than pi / 2
+		if (radians_from_min + dial_spacing) <= (math.pi / 2):
+			if radians_from_min <= 0:
+				delta_x = abs(math.sin(dial_spacing) * dial_radius) * -1
+				delta_y = abs(math.cos(dial_spacing) * dial_radius) * 1
+			else:
+				phi = (math.pi / 2) - dial_spacing - radians_from_min
+				delta_x = abs(math.cos(phi) * dial_radius) * -1
+				delta_y = abs(math.sin(phi) * dial_radius) * 1
+		#if less than pi
+		elif (radians_from_min + dial_spacing) <= (math.pi):
+			phi = radians_from_min + dial_spacing - (math.pi / 2)
+			delta_x = abs(math.cos(phi) * dial_radius) * -1
+			delta_y = abs(math.sin(phi) * dial_radius) * -1
+		#if less than 3 pi / 2
+		elif (radians_from_min + dial_spacing) <= (math.pi * 3 / 2):
+			phi = radians_from_min + dial_spacing - math.pi
+			delta_x = abs(math.sin(phi) * dial_radius) * 1
+			delta_y = abs(math.cos(phi) * dial_radius) * -1
+		#if less than the max point
+		else:
+			if (radians_from_min + dial_spacing) >= ((2 * math.pi) - dial_spacing):
+				delta_x = abs(math.sin(dial_spacing) * dial_radius) * 1
+				delta_y = abs(math.cos(dial_spacing) * dial_radius) * 1
+			else:
+				phi = radians_from_min + dial_spacing - (math.pi * 3 / 2)
+				delta_x = abs(math.cos(phi) * dial_radius) * 1
+				delta_y = abs(math.sin(phi) * dial_radius) * 1
+		center_point_x = x0_dial + dial_radius
+		center_point_y = y0_dial + dial_radius
+		(self.master).create_line((center_point_x + delta_x), (center_point_y + delta_y), center_point_x, center_point_y, width=thickness)
+
+		#create the main label:
+		(self.master).create_text((center_point_x + offset_main_label_x), (center_point_y + offset_main_label_y), text=name_of_guage, font=font_main_label)
+
+	def build_dials(self):
+		#styling:
+		speed_name = "Speed"
+		rpm_name = "RPM"
+		main_label_font = Font(family="Arial", size=15)
+		needle_thickness = 5
+		text_label_font = Font(family="Arial", size=10)
+		num_labels = 10
+		offset_ticks = 10 #px
+		offset_text = 20 #px
+		offset_main_label_x = 0 #px
+		offset_main_label_y = 75 #px
+		dial_spacing = (math.pi / 3) #should be less than pi / 2
+		dial_radius = 150 #px
+		y_percent = 30 #y0 offset from the top
+		x_percent = 6 #x0 offset from the left
+		min_value_speed = 0
+		max_value_speed = 120
+		min_value_rpm = 0
+		max_value_rpm = 3000
+		
+		#Dials
+		x0_dial1 = self.width * (x_percent / 100)
+		y0_dial1 = self.height * (y_percent / 100)
+		x1_dial1 = x0_dial1 + (2 * dial_radius)
+		y1_dial1 = y0_dial1 + (2 * dial_radius)
+		x1_dial2 = self.width * ((100 - x_percent) / 100)
+		x0_dial2 = x1_dial2 - (2 * dial_radius)
+		y0_dial2 = self.height * (y_percent / 100)
+		y1_dial2 = y0_dial2 + (2 * dial_radius)
+
+		#create dials 1 and 2
+		(self.master).create_oval(x0_dial1, y0_dial1, x1_dial1, y1_dial1)
+		(self.master).create_oval(x0_dial2, y0_dial2, x1_dial2, y1_dial2)
+
+		#create the needle for the dials:
+		#dial 1: speed:
+		#dial spacing is the radians of angle between the horizontal and the first zero, make sure it is less than pi / 2
+		self.create_needle(self.speed, min_value_speed, max_value_speed, dial_spacing, x0_dial1, y0_dial1, dial_radius, needle_thickness, speed_name, main_label_font, offset_main_label_x, offset_main_label_y)
+		#dial 2: rpm
+		self.create_needle(self.rpm, min_value_rpm, max_value_rpm, dial_spacing, x0_dial2, y0_dial2, dial_radius, needle_thickness, rpm_name, main_label_font, offset_main_label_x, offset_main_label_y)
 
 		#create tickmarks and labels for dial
 		#speed
-		create_tickmarks_and_labels(min_value_speed, max_value_speed, dial_spacing, x0_dial1, y0_dial1, dial_radius, offset_ticks, offset_text)
+		self.create_tickmarks_and_labels(min_value_speed, max_value_speed, dial_spacing, x0_dial1, y0_dial1, dial_radius, offset_ticks, offset_text, num_labels, text_label_font)
 		#rpm
-		create_tickmarks_and_labels(min_value_rpm, max_value_rpm, dial_spacing, x0_dial2, y0_dial2, dial_radius, offset_ticks, offset_text)
+		self.create_tickmarks_and_labels(min_value_rpm, max_value_rpm, dial_spacing, x0_dial2, y0_dial2, dial_radius, offset_ticks, offset_text, num_labels, text_label_font)
 
+	def time_info(self):
+		#if there are previous laps:
+		if self.previous_laps != []:
+			current_time = time.time() - self.initial_time
+			self.current_lap = current_time - self.sum_previous_laps
+			self.previous_lap_time.config(text='{0:.3f}'.format(self.previous_laps[len(self.previous_laps) - 1]))
+			#there are previous laps
+			self.total_time.config(text='{0:.3f}'.format(current_time))
+			self.lap_time.config(text='{0:.3f}'.format(self.current_lap))
+		#if there are no previous laps:
+		else:
+			self.previous_lap_time.config(text='n/a')
+		#add the current time:
+		the_time_and_date = str(datetime.now())
+		the_time = the_time_and_date[11:]
+		the_date = the_time_and_date[:10]
+		self.current_time.config(text='{0}'.format(the_time[:11]))
+		current_lap_count = len(self.previous_laps)
+		self.lap_count.config(text='Lap {0:.0f}'.format(current_lap_count))
+
+	def reset_gui(self, master):
+		#reset the lap info
+		self.first_new_lap_click = True
+		self.new_lap_button.config(text="Start")
+		self.total_time.config(text="n/a")
+		self.lap_time.config(text="n/a")
+		self.current_lap = 0
+		self.sum_previous_laps = 0
+		#send this data to mysql db
+		self.previous_laps = []
 
 	def new_lap(self, master):
 		if self.first_new_lap_click == True:
@@ -172,29 +321,43 @@ class StevensBajaSAE(tk.Frame):
 		self.sum_previous_laps = sum(self.previous_laps)
 
 	def refresh(self):
+		#TIME:
+		self.time_info()
+
+		#refresh the width and height of the screen:
+		self.width = (self.master).winfo_width()
+		self.height = (self.master).winfo_height()
+
 		#refresh the data input
 		#input_data = ser.readline()
 		#print(input_data)
-		#if there are previous laps:
-		if self.previous_laps != []:
-			current_time = time.time() - self.initial_time
-			self.current_lap = current_time - self.sum_previous_laps
-			self.previous_lap_time.config(text='{:07.3f}'.format(self.previous_laps[len(self.previous_laps) - 1]))
-			#there are previous laps
-			self.total_time.config(text='{:07.3f}'.format(current_time))
-			self.lap_time.config(text='{:07.3f}'.format(self.current_lap))
-		#if there are no previous laps:
-		else:
-			self.previous_lap_time.config(text='n/a')
-
 		#configure all of the new data input:
-		self.speed = 50 #for speedometer
-		self.rpm = 1800 #for rpm dial
-		#build the dials:
+		#NEW DATA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		self.speed = 70 #for speedometer
+		self.rpm = 500 #for rpm dial
+		self.temp_1 = 200 #temp for engine
+		self.temp_2 = 500 #temp for engine perimeter
+		self.other_data_input = "This is more data..." #extra data that can be added
+		self.fuel_level = 30 #percent (%)
+		self.driving_mode = 0 #0 = forward, 1 = neutral, 2 = reverse
+		#add data to the labels:
+		self.temperature_1.config(text='{0:.2f}'.format(self.temp_1))
+		self.temperature_2.config(text='{0:.2f}'.format(self.temp_2))
+		self.other_data.config(text='{0}'.format(self.other_data_input))
+
+		#working with Canvas - first delete everything from before:
 		(self.master).delete("all")
-		self.build_dials(self.master)
+		#build the dials:
+		self.build_dials()
+
+		#build the fuel gauge:
+		self.build_fuel_gauge(self.fuel_level)
+
+		#build the driving mode:
+		self.build_driving_mode_indicator(self.driving_mode)
+
 		#refresh data:
-		self.master.after(10, self.refresh)
+		(self.master).after(10, self.refresh)
 
 	def __init__(self, master):
 		#initialize the app - the size, title, etc.
@@ -205,22 +368,24 @@ class StevensBajaSAE(tk.Frame):
 		#background color
 		header_background = "#%02x%02x%02x" % (128, 192, 200)
 		#font
-		header_font = Font(family="Arial", size=15)
+		header_font = Font(family="Arial", size=12)
 		#Time
 		#background color
 		time_background = "#%02x%02x%02x" % (128, 192, 200)
-		time_label_background = "#%02x%02x%02x" % (128, 192, 200)
 		#font
-		time_font = Font(family="Arial", size=15)
-		time_label_font = Font(family="Arial", size=10)
+		time_font = Font(family="Arial", size=12)
+		lap_count_font = Font(family="Arial", size=15)
 		#Diagnostic
 		#background color
 		diagnostic_background = "#%02x%02x%02x" % (128, 192, 200)
+		current_time_background = "#%02x%02x%02x" % (128, 192, 200)
 		#font
-		diagnostic_font = Font(family="Arial", size=15)
+		diagnostic_font = Font(family="Arial", size=12)
+		current_time_font = Font(family="Arial", size=15)
 
 
 		#vars for widgets:
+		self.current_gear = "P"
 		self.lap_count = 0
 		self.previous_laps = list()
 		self.current_lap = 0
@@ -230,37 +395,48 @@ class StevensBajaSAE(tk.Frame):
 		#create the widgets:
 		#time widgets
 		self.total_time = Label(master, font = time_font, bg=time_background, text = "n/a")
-		self.total_time_label = Label(master, font = time_label_font, bg=time_label_background, text = "Total Time Elapsed")
+		self.total_time_label = Label(master, font = header_font, bg=header_background, text = "Total Time Elapsed")
 		self.lap_time = Label(master, font = time_font, bg=time_background, text = "n/a")
-		self.lap_time_label = Label(master, font = time_label_font, bg=time_label_background, text = "Current Lap Time")
+		self.lap_time_label = Label(master, font = header_font, bg=header_background, text = "Current Lap Time")
 		self.previous_lap_time = Label(master, font = time_font, bg=time_background)
-		self.previous_lap_time_label = Label(master, font = time_label_font, bg=time_label_background, text = "Previous Lap Time")
+		self.previous_lap_time_label = Label(master, font = header_font, bg=header_background, text = "Previous Lap Time")
 		#lap widget
-		self.new_lap_label = Label(master, font = time_label_font, bg=time_label_background, text = "New Lap")
-		self.new_lap_button = tk.Button(master, text="Start", font = time_font, bg = time_label_background)
+		self.lap_count = Label(master, font = lap_count_font, bg=header_background, text="0")
+		self.new_lap_button = tk.Button(master, text="Start", font = time_font, bg = time_background)
 		#when button is pressed go to the new_lap function
 		self.new_lap_button.bind('<ButtonPress>', self.new_lap)
-		self.lap_count = Label(master, font = time_label_font, bg=time_label_background)
-
 
 		#Temperature and other diagnostic data
-		self.diagnostic_header = Label(master, font = header_font, bg=header_background, text = "Diagnostic Data")
-		self.engine_temp = Label(master, font = diagnostic_font, bg=diagnostic_background)
+		self.temperature_1_header = Label(master, font = header_font, bg=header_background, text = "Engine Temp")
+		self.temperature_1 = Label(master, font = diagnostic_font, bg=diagnostic_background)
+		self.temperature_2_header = Label(master, font = header_font, bg=header_background, text = "Engine-2 Temp")
+		self.temperature_2 = Label(master, font = diagnostic_font, bg=diagnostic_background)
+		self.other_data_header = Label(master, font = header_font, bg=header_background, text = "Other Data")
+		self.other_data = Label(master, font = diagnostic_font, bg=diagnostic_background)
+		self.current_time = Label(master, font = current_time_font, bg=current_time_background)
+		self.reset_button = tk.Button(master, text = "Reset", font = diagnostic_font, bg=diagnostic_background)
+		#when button is pressed go to the reset_gui function
+		self.reset_button.bind('<ButtonPress>', self.reset_gui)
 
 		#place the widgets
 		self.total_time_label.grid(row=0, column=0, sticky=N+S+E+W)
 		self.total_time.grid(row=1, column=0, sticky=N+S+E+W)
 		self.lap_time_label.grid(row=0, column=1, sticky=N+S+E+W)
 		self.lap_time.grid(row=1, column=1, sticky=N+S+E+W)
-		self.new_lap_label.grid(row=0, column=2, sticky=N+S+E+W)
+		self.lap_count.grid(row=0, column=2, sticky=N+S+E+W)
 		self.new_lap_button.grid(row=1, column = 2, sticky=N+S+E+W)
 		self.previous_lap_time_label.grid(row=0, column=3, sticky=N+S+E+W)
 		self.previous_lap_time.grid(row=1, column=3, sticky=N+S+E+W)
 		#create a space in the grid to house the canvas widgets:
-		row_spacing = 6
-		self.diagnostic_header.grid(row=(1 + row_spacing), column = 0, sticky=N+S+E+W)
-		self.engine_temp.grid(row=(2 + row_spacing), column=0, sticky=N+S+E+W)
-
+		row_spacing = 10
+		self.temperature_1_header.grid(row=(row_spacing), column=0, sticky=N+S+E+W)
+		self.temperature_1.grid(row=(1 + row_spacing), column=0, sticky=N+S+E+W)
+		self.temperature_2_header.grid(row=(row_spacing), column=1, sticky=N+S+E+W)
+		self.temperature_2.grid(row=(1 + row_spacing), column=1, sticky=N+S+E+W)
+		self.other_data_header.grid(row=(row_spacing), column=2, sticky=N+S+E+W)
+		self.other_data.grid(row=(1 + row_spacing), column=2, sticky=N+S+E+W)
+		self.current_time.grid(row=(row_spacing), column=3, sticky=N+S+E+W)
+		self.reset_button.grid(row=(1 + row_spacing), column=3, sticky=N+S+E+W)
 
 		#allow for self resizing:
 		for x in range(Grid.grid_size(master)[0]):
