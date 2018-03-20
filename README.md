@@ -36,3 +36,5 @@ git clone "http://github.com/jschmidtnj/StevensBajaSAE/"
 git add -A
 git commit -m "your commit message"
 git push origin master
+https://github.com/adafruit/Adafruit_Python_CharLCD
+https://github.com/adafruit/Adafruit_Python_LED_Backpack
