@@ -56,6 +56,9 @@ class StevensBajaSAE(tk.Frame):
 
 	def build_fuel_gauge(self, fuel_level):
 		#styling:
+		out_of_fuel_threshold = 5 #percent
+		out_of_fuel_label = "OUT OF FUEL"
+		out_of_fuel_font = Font(family="Arial", size=30)
 		main_label = "Fuel Guage"
 		main_label_font = Font(family="Arial", size=20)
 		offset_main_label_x = 0 #px left
@@ -76,6 +79,12 @@ class StevensBajaSAE(tk.Frame):
 		height_of_fuelguage = 100 #px
 		y_percent = 65 #y0 offset from the top
 		x_percent = 0 #x0 offset to the left of the center
+
+		#avoid potential problems:
+		if fuel_level < 0:
+			fuel_level = 0
+		elif fuel_level > 100:
+			fuel_level = 100
 		
 		#background_guage
 		x0_background_guage = (self.width * (.5 - x_percent / 100)) - (width_of_fuelguage / 2)
@@ -122,10 +131,14 @@ class StevensBajaSAE(tk.Frame):
 			(self.master).create_text((x0_background_guage + delta_x), (y0_background_guage + delta_y + text_offset), text=("{0:.0f}".format(current_tick_label)), font=text_label_font)
 
 		#create current level label
-		(self.master).create_text((x1_indicator_guage + current_fuel_level_x_offset), (y0_background_guage + (height_of_fuelguage / 2)), text=("{0:.02f}%".format(self.fuel_level)), font=current_fuel_level_indicator_font)
+		(self.master).create_text((x1_indicator_guage + current_fuel_level_x_offset), (y0_background_guage + (height_of_fuelguage / 2)), text=("{0:.02f}%".format(fuel_level)), font=current_fuel_level_indicator_font)
 
 		#create the main label
 		(self.master).create_text((x0_background_guage + (width_of_fuelguage / 2) - offset_main_label_x), (y0_background_guage - offset_main_label_y), text=main_label, font=main_label_font)
+
+		#create the out of fuel label
+		if fuel_level < out_of_fuel_threshold:
+			(self.master).create_text((x0_background_guage + (width_of_fuelguage / 2)), (y0_background_guage + (height_of_fuelguage / 2)), text=out_of_fuel_label, font=out_of_fuel_font)
 
 	def create_tickmarks_and_labels(self, min_value, max_value, dial_spacing, x0_dial, y0_dial, dial_radius, offset_ticks, offset_text, num_labels, text_label_font):
 			#this method makes the tickmarks and labels. labels are defined by the x and y offsets * some value constant * -1
@@ -299,6 +312,9 @@ class StevensBajaSAE(tk.Frame):
 		current_lap_count = len(self.previous_laps)
 		self.lap_count.config(text='Lap {0:.0f}'.format(current_lap_count))
 
+	def added_fuel(self, master):
+		self.last_fueling_time = time.time()
+
 	def reset_gui(self, master):
 		#reset the lap info
 		self.first_new_lap_click = True
@@ -338,7 +354,6 @@ class StevensBajaSAE(tk.Frame):
 		self.temp_1 = 200 #temp for engine
 		self.temp_2 = 500 #temp for engine perimeter
 		self.other_data_input = "This is more data..." #extra data that can be added
-		self.fuel_level = 30 #percent (%)
 		self.driving_mode = 0 #0 = forward, 1 = neutral, 2 = reverse
 		#add data to the labels:
 		self.temperature_1.config(text='{0:.2f}'.format(self.temp_1))
@@ -349,6 +364,9 @@ class StevensBajaSAE(tk.Frame):
 		(self.master).delete("all")
 		#build the dials:
 		self.build_dials()
+
+		#adjust the fuel level:
+		self.fuel_level = self.fuel_level_starting_percentage - ((time.time() - self.last_fueling_time) / self.fuel_level_duration * 100)
 
 		#build the fuel gauge:
 		self.build_fuel_gauge(self.fuel_level)
@@ -391,6 +409,9 @@ class StevensBajaSAE(tk.Frame):
 		self.current_lap = 0
 		self.sum_previous_laps = 0
 		self.first_new_lap_click = True
+		self.fuel_level_starting_percentage = 100 #percent (%)
+		self.fuel_level_duration = 120 #seconds
+		self.last_fueling_time = time.time()
 
 		#create the widgets:
 		#time widgets
@@ -417,6 +438,9 @@ class StevensBajaSAE(tk.Frame):
 		self.reset_button = tk.Button(master, text = "Reset", font = diagnostic_font, bg=diagnostic_background)
 		#when button is pressed go to the reset_gui function
 		self.reset_button.bind('<ButtonPress>', self.reset_gui)
+		#adding fuel:
+		self.add_fuel = tk.Button(master, text = "Add Fuel", font = diagnostic_font, bg=diagnostic_background)
+		self.add_fuel.bind('<ButtonPress>', self.added_fuel)
 
 		#place the widgets
 		self.total_time_label.grid(row=0, column=0, sticky=N+S+E+W)
@@ -433,8 +457,8 @@ class StevensBajaSAE(tk.Frame):
 		self.temperature_1.grid(row=(1 + row_spacing), column=0, sticky=N+S+E+W)
 		self.temperature_2_header.grid(row=(row_spacing), column=1, sticky=N+S+E+W)
 		self.temperature_2.grid(row=(1 + row_spacing), column=1, sticky=N+S+E+W)
-		self.other_data_header.grid(row=(row_spacing), column=2, sticky=N+S+E+W)
-		self.other_data.grid(row=(1 + row_spacing), column=2, sticky=N+S+E+W)
+		self.other_data.grid(row=(row_spacing), column=2, sticky=N+S+E+W)
+		self.add_fuel.grid(row=(1 + row_spacing), column=2, sticky=N+S+E+W)
 		self.current_time.grid(row=(row_spacing), column=3, sticky=N+S+E+W)
 		self.reset_button.grid(row=(1 + row_spacing), column=3, sticky=N+S+E+W)
 
