@@ -6,11 +6,25 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import *
 from tkinter.font import Font
+from Adafruit_LED_Backpack import SevenSegment
 
-port = "/dev/ttyS0" #USB0 on pi
+'''
+port = "/dev/USB0" #ttyS0 on other
 rate = 9600
 ser = serial.Serial(port, rate)
 ser.flushInput()
+'''
+
+
+#initialize the seven-segment displays:
+seven_segment_display_1 = SevenSegment.SevenSegment(address=0x70)
+seven_segment_display_1.begin()
+'''
+seven_segment_display_2 = SevenSegment.SevenSegment()
+seven_segment_display_2.begin()
+seven_segment_display_3 = SevenSegment.SevenSegment()
+seven_segment_display_3.begin()
+'''
 
 class StevensBajaSAE(tk.Frame):
 	"""This is the class for the application window, the app being the tkinter setup"""
@@ -296,7 +310,7 @@ class StevensBajaSAE(tk.Frame):
 		#if there are previous laps:
 		if self.previous_laps != []:
 			current_time = time.time() - self.initial_time
-			self.current_lap = current_time - self.sum_previous_laps
+			self.current_lap = current_time - self.sum_pprevious_laps
 			self.previous_lap_time.config(text='{0:.3f}'.format(self.previous_laps[len(self.previous_laps) - 1]))
 			#there are previous laps
 			self.total_time.config(text='{0:.3f}'.format(current_time))
@@ -343,7 +357,7 @@ class StevensBajaSAE(tk.Frame):
 		#refresh the width and height of the screen:
 		self.width = (self.master).winfo_width()
 		self.height = (self.master).winfo_height()
-
+		
 		#refresh the data input
 		#input_data = ser.readline()
 		#print(input_data)
@@ -359,6 +373,10 @@ class StevensBajaSAE(tk.Frame):
 		self.temperature_1.config(text='{0:.2f}'.format(self.temp_1))
 		self.temperature_2.config(text='{0:.2f}'.format(self.temp_2))
 		self.other_data.config(text='{0}'.format(self.other_data_input))
+		#data for the displays
+		self.seven_segment_display_1_data = 12.222
+		self.seven_segment_display_2_data = 13.222
+		self.seven_segment_display_3_data = 14.222
 
 		#working with Canvas - first delete everything from before:
 		(self.master).delete("all")
@@ -373,7 +391,21 @@ class StevensBajaSAE(tk.Frame):
 
 		#build the driving mode:
 		self.build_driving_mode_indicator(self.driving_mode)
-
+		
+		#send data to seven segment displays
+		seven_segment_display_1.clear()
+		'''
+		seven_segment_display_2.clear()
+		seven_segment_display_3.clear()
+		'''
+		seven_segment_display_1.print_float(self.seven_segment_display_1_data, decimal_digits=2)
+		'''
+		seven_segment_display_2.print_float(self.seven_segment_display_2_data, decimal_digits=2)
+		seven_segment_display_3.print_float(self.seven_segment_display_3_data, decimal_digits=2)
+		'''
+		
+		seven_segment_display_1.write_display()
+                
 		#refresh data:
 		(self.master).after(10, self.refresh)
 
@@ -400,7 +432,13 @@ class StevensBajaSAE(tk.Frame):
 		#font
 		diagnostic_font = Font(family="Arial", size=12)
 		current_time_font = Font(family="Arial", size=15)
-
+		
+		#other displays:
+		seven_segment_display_1.set_colon(False)
+		'''
+		seven_segment_display_2.set_colon(False)
+		seven_segment_display_3.set_colon(False)
+                '''
 
 		#vars for widgets:
 		self.current_gear = "P"

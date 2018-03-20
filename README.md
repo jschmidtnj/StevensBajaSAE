@@ -38,3 +38,5 @@ git commit -m "your commit message"
 git push origin master
 https://github.com/adafruit/Adafruit_Python_CharLCD
 https://github.com/adafruit/Adafruit_Python_LED_Backpack
+make sure to install serial: sudo pip3 install pyserial
+make sure you run the app as python3, and all of the installs as python3
