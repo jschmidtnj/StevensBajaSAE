@@ -46,3 +46,5 @@ configuring ic2: https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio
 LCD config: https://pimylifeup.com/raspberry-pi-lcd-16x2/
 Temperature Library (high temp): https://github.com/milesburton/Arduino-Temperature-Control-Library
 library (thermocouple): https://learn.adafruit.com/thermocouple?view=all
+also needed: https://github.com/PaulStoffregen/OneWire
+the circuit: https://create.arduino.cc/projecthub/TheGadgetBoy/ds18b20-digital-temperature-sensor-and-arduino-9cc806
