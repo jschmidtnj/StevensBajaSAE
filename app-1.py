@@ -7,6 +7,38 @@ import tkinter as tk
 from tkinter import *
 from tkinter.font import Font
 from Adafruit_LED_Backpack import SevenSegment
+import Adafruit_CharLCD as LCD
+
+#LCD 1:
+# Raspberry Pi pin configuration:
+lcd_1_rs        = 25  # Note this might need to be changed to 21 for older revision Pi's.
+lcd_1_en        = 24
+lcd_1_d4        = 23
+lcd_1_d5        = 17
+lcd_1_d6        = 18
+lcd_1_d7        = 22
+lcd_1_backlight = 4
+
+# Define LCD column and row size for 16x2 LCD.
+lcd_columns = 16
+lcd_rows    = 2
+
+# Initialize the LCD using the pins above.
+lcd_1 = LCD.Adafruit_CharLCD(lcd_1_rs, lcd_1_en, lcd_1_d4, lcd_1_d5, lcd_1_d6, lcd_1_d7, lcd_columns, lcd_rows, lcd_1_backlight)
+
+#LCD 2:
+# Raspberry Pi pin configuration:
+lcd_2_rs        = 25  # Note this might need to be changed to 21 for older revision Pi's.
+lcd_2_en        = 24
+lcd_2_d4        = 23
+lcd_2_d5        = 17
+lcd_2_d6        = 18
+lcd_2_d7        = 22
+lcd_2_backlight = 4
+
+# Initialize the LCD using the pins above.
+lcd_1 = LCD.Adafruit_CharLCD(lcd_2_rs, lcd_2_en, lcd_2_d4, lcd_2_d5, lcd_2_d6, lcd_2_d7, lcd_columns, lcd_rows, lcd_2_backlight)
+
 
 '''
 port = "/dev/USB0" #ttyS0 on other
@@ -19,6 +51,7 @@ ser.flushInput()
 #initialize the seven-segment displays:
 seven_segment_display_1 = SevenSegment.SevenSegment(address=0x70)
 seven_segment_display_1.begin()
+#3 seven segment displays
 '''
 seven_segment_display_2 = SevenSegment.SevenSegment()
 seven_segment_display_2.begin()
@@ -29,7 +62,7 @@ seven_segment_display_3.begin()
 class StevensBajaSAE(tk.Frame):
 	"""This is the class for the application window, the app being the tkinter setup"""
 	def build_driving_mode_indicator(self, driving_mode):
-		#styling:
+                #styling:
 		main_label_font = Font(family="Arial", size=30)
 		secondary_label_font = Font(family="Arial", size=12)
 		offset_secondary_label = 35 #px
@@ -310,7 +343,7 @@ class StevensBajaSAE(tk.Frame):
 		#if there are previous laps:
 		if self.previous_laps != []:
 			current_time = time.time() - self.initial_time
-			self.current_lap = current_time - self.sum_pprevious_laps
+			self.current_lap = current_time - self.sum_previous_laps
 			self.previous_lap_time.config(text='{0:.3f}'.format(self.previous_laps[len(self.previous_laps) - 1]))
 			#there are previous laps
 			self.total_time.config(text='{0:.3f}'.format(current_time))
@@ -330,15 +363,16 @@ class StevensBajaSAE(tk.Frame):
 		self.last_fueling_time = time.time()
 
 	def reset_gui(self, master):
-		#reset the lap info
-		self.first_new_lap_click = True
-		self.new_lap_button.config(text="Start")
-		self.total_time.config(text="n/a")
-		self.lap_time.config(text="n/a")
-		self.current_lap = 0
-		self.sum_previous_laps = 0
-		#send this data to mysql db
-		self.previous_laps = []
+                #reset the lap info
+                self.added_fuel(master)
+                self.first_new_lap_click = True
+                self.new_lap_button.config(text="Start")
+                self.total_time.config(text="n/a")
+                self.lap_time.config(text="n/a")
+                self.current_lap = 0
+                self.sum_previous_laps = 0
+                #send this data to mysql db
+                self.previous_laps = []
 
 	def new_lap(self, master):
 		if self.first_new_lap_click == True:
@@ -374,9 +408,13 @@ class StevensBajaSAE(tk.Frame):
 		self.temperature_2.config(text='{0:.2f}'.format(self.temp_2))
 		self.other_data.config(text='{0}'.format(self.other_data_input))
 		#data for the displays
+		#seven-segment displays:
 		self.seven_segment_display_1_data = 12.222
 		self.seven_segment_display_2_data = 13.222
 		self.seven_segment_display_3_data = 14.222
+		#LCDs:
+		self.lcd_1_data = "Hello World\nLCD1..."
+		self.lcd_2_data = "Hello World\nLCD1..."
 
 		#working with Canvas - first delete everything from before:
 		(self.master).delete("all")
@@ -403,6 +441,12 @@ class StevensBajaSAE(tk.Frame):
 		seven_segment_display_2.print_float(self.seven_segment_display_2_data, decimal_digits=2)
 		seven_segment_display_3.print_float(self.seven_segment_display_3_data, decimal_digits=2)
 		'''
+		
+		#send data to the LCDs
+		lcd_1.clear()
+		#lcd_2.clear()
+		lcd_1.message(self.lcd_1_data)
+		#lcd_2.message(self.lcd_2_data)
 		
 		seven_segment_display_1.write_display()
                 
