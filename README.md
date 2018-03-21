@@ -40,3 +40,5 @@ https://github.com/adafruit/Adafruit_Python_CharLCD
 https://github.com/adafruit/Adafruit_Python_LED_Backpack
 make sure to install serial: sudo pip3 install pyserial
 run the app as python3, and all of the installs as python3
+push buttons: http://razzpisampler.oreilly.com/ch07.html
+pi gpio pinout: https://pinout.xyz/

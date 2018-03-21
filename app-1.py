@@ -8,6 +8,17 @@ from tkinter import *
 from tkinter.font import Font
 from Adafruit_LED_Backpack import SevenSegment
 import Adafruit_CharLCD as LCD
+import RPi.GPIO as GPIO
+
+#setup for buttons:
+GPIO.setmode(GPIO.BCM)
+#pushbutton pin numbers:
+button_1_pin = 20 #BCM 20
+GPIO.setup(button_1_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+'''
+button_2_pin = 20 #BCM 20
+GPIO.setup(button_2_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+'''
 
 #LCD 1:
 # Raspberry Pi pin configuration:
@@ -392,6 +403,13 @@ class StevensBajaSAE(tk.Frame):
 		self.width = (self.master).winfo_width()
 		self.height = (self.master).winfo_height()
 		
+		#get push button input:
+		self.button_1_state = not GPIO.input(button_1_pin)
+		#self.button_2_state = not GPIO.input(button_2_pin)
+		#etc...
+		if self.button_1_state:
+                    print("Button 1 Pressed")
+		
 		#refresh the data input
 		#input_data = ser.readline()
 		#print(input_data)
@@ -441,6 +459,7 @@ class StevensBajaSAE(tk.Frame):
 		seven_segment_display_2.print_float(self.seven_segment_display_2_data, decimal_digits=2)
 		seven_segment_display_3.print_float(self.seven_segment_display_3_data, decimal_digits=2)
 		'''
+		seven_segment_display_1.write_display()
 		
 		#send data to the LCDs
 		lcd_1.clear()
@@ -448,7 +467,6 @@ class StevensBajaSAE(tk.Frame):
 		lcd_1.message(self.lcd_1_data)
 		#lcd_2.message(self.lcd_2_data)
 		
-		seven_segment_display_1.write_display()
                 
 		#refresh data:
 		(self.master).after(10, self.refresh)
@@ -478,11 +496,15 @@ class StevensBajaSAE(tk.Frame):
 		current_time_font = Font(family="Arial", size=15)
 		
 		#other displays:
+		#SSD:
 		seven_segment_display_1.set_colon(False)
 		'''
 		seven_segment_display_2.set_colon(False)
 		seven_segment_display_3.set_colon(False)
                 '''
+		#Pushbuttons:
+		self.button_1_state = False #false = off
+		#self.button_2_state = False #false = off
 
 		#vars for widgets:
 		self.current_gear = "P"
