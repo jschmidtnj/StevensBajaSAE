@@ -42,3 +42,5 @@ make sure to install serial: sudo pip3 install pyserial
 run the app as python3, and all of the installs as python3
 push buttons: http://razzpisampler.oreilly.com/ch07.html
 pi gpio pinout: https://pinout.xyz/
+configuring ic2: https://learn.adafruit.com/adafruits-raspberry-pi-lesson-4-gpio-setup/configuring-i2c
+LCD config: https://pimylifeup.com/raspberry-pi-lcd-16x2/
