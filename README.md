@@ -24,7 +24,7 @@ On the pi, a mysql database stores all of the inputted data. This database can e
 
 The Amazon ec2 instance contains a copy of the mysql database found on the pi. It also contains a node.js server with an angularjs frontend and expressjs backend, to enable fast javascript graphs and analytics. The amazon instance has an automatic DNS, meaning a specific URL is all you need to view the inner workings and analytics of the car.
 
-## Comclusion
+## Conclusion
 
 Through using this new dash system, the Stevens Baja SAE team is able to provide real-time analysis of any problems in the car, as well as valuable data to show what the driver could do better when training. Data is stored redundantly, and everything about the system, from the analog output in the dash to the node.js-based website, can be fully customized. We believe this system will give the Stevens team the edge it needs to compete well this racing season.
 
@@ -48,3 +48,4 @@ Temperature Library (high temp): https://github.com/milesburton/Arduino-Temperat
 library (thermocouple): https://learn.adafruit.com/thermocouple?view=all
 also needed: https://github.com/PaulStoffregen/OneWire
 the circuit: https://create.arduino.cc/projecthub/TheGadgetBoy/ds18b20-digital-temperature-sensor-and-arduino-9cc806
+the i2c pinout: https://pinout.xyz/pinout/i2c#
