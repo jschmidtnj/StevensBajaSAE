@@ -49,3 +49,4 @@ library (thermocouple): https://learn.adafruit.com/thermocouple?view=all
 also needed: https://github.com/PaulStoffregen/OneWire
 the circuit: https://create.arduino.cc/projecthub/TheGadgetBoy/ds18b20-digital-temperature-sensor-and-arduino-9cc806
 the i2c pinout: https://pinout.xyz/pinout/i2c#
+add submodule libraries: git submodule add https://github.com/adafruit/Adafruit_Python_CharLCD Adafruit_Python_CharLCD

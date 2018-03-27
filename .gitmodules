@@ -1,0 +1,9 @@
+[submodule "libraries/MAX6675-library"]
+	path = libraries/MAX6675-library
+	url = https://github.com/adafruit/MAX6675-library
+[submodule "libraries/Adafruit_Python_LED_Backpack"]
+	path = libraries/Adafruit_Python_LED_Backpack
+	url = https://github.com/adafruit/Adafruit_Python_LED_Backpack
+[submodule "libraries/Adafruit_Python_CharLCD"]
+	path = libraries/Adafruit_Python_CharLCD
+	url = https://github.com/adafruit/Adafruit_Python_CharLCD
