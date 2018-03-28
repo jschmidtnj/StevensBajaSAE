@@ -466,7 +466,7 @@ class StevensBajaSAE(tk.Frame):
 		#lcd_2.clear()
 		lcd_1.create_char
 		(0, [0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f])
-		lcd.message(¨00¨)
+		lcd.message('\x00')
 		#lcd_1.message(self.lcd_1_data)
 		#lcd_2.message(self.lcd_2_data)
 		
