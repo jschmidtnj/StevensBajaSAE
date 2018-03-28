@@ -89,27 +89,27 @@ class StevensBajaSAE(tk.Frame):
 			driving_mode_text = "F"
 			secondary_label_1_text = "N"
 			secondary_label_2_text = "R"
-			secondary_label_1_offset_y = 1 * offset_secondary_label
-			secondary_label_2_offset_y = 2 * offset_secondary_label
+			secondary_label_1_offset_x = 1 * offset_secondary_label
+			secondary_label_2_offset_x = 2 * offset_secondary_label
 		elif driving_mode == 1:
 			#neutral
 			secondary_label_1_text = "F"
 			driving_mode_text = "N"
 			secondary_label_2_text = "R"
-			secondary_label_1_offset_y = -1 * offset_secondary_label
-			secondary_label_2_offset_y = 1 * offset_secondary_label
+			secondary_label_1_offset_x = -1 * offset_secondary_label
+			secondary_label_2_offset_x = 1 * offset_secondary_label
 		else:
 			#reverse
 			secondary_label_1_text = "F"
 			secondary_label_2_text = "N"
 			driving_mode_text = "R"
-			secondary_label_1_offset_y = -2 * offset_secondary_label
-			secondary_label_2_offset_y = -1 * offset_secondary_label
+			secondary_label_1_offset_x = -2 * offset_secondary_label
+			secondary_label_2_offset_x = -1 * offset_secondary_label
 
 		#create the main text:
 		(self.master).create_text(x0_main_label, y0_main_label, text=driving_mode_text, font=main_label_font)
-		(self.master).create_text(x0_main_label, y0_main_label + secondary_label_1_offset_y, text=secondary_label_1_text, font=secondary_label_font)
-		(self.master).create_text(x0_main_label, y0_main_label + secondary_label_2_offset_y, text=secondary_label_2_text, font=secondary_label_font)
+		(self.master).create_text(x0_main_label + secondary_label_1_offset_x, y0_main_label, text=secondary_label_1_text, font=secondary_label_font)
+		(self.master).create_text(x0_main_label +  secondary_label_2_offset_x, y0_main_label, text=secondary_label_2_text, font=secondary_label_font)
 
 
 	def build_fuel_gauge(self, fuel_level):
@@ -117,10 +117,10 @@ class StevensBajaSAE(tk.Frame):
 		out_of_fuel_threshold = 5 #percent
 		out_of_fuel_label = "OUT OF FUEL"
 		out_of_fuel_font = Font(family="Arial", size=30)
-		main_label = "Fuel Guage"
+		main_label = "Fuel"
 		main_label_font = Font(family="Arial", size=20)
 		offset_main_label_x = 0 #px left
-		offset_main_label_y = 35 #px up
+		offset_main_label_y = 25 #px up
 		current_fuel_level_x_offset = 35 #px
 		current_fuel_level_indicator_font = Font(family="Arial", size=12)
 		text_label_font = Font(family="Arial", size=12)
@@ -133,9 +133,9 @@ class StevensBajaSAE(tk.Frame):
 		guage_red = (166, 0, 7)
 		num_labels = 3
 		offset_text = 20 #px
-		width_of_fuelguage = 600 #px
-		height_of_fuelguage = 100 #px
-		y_percent = 65 #y0 offset from the top
+		width_of_fuelguage = 300 #px
+		height_of_fuelguage = 50 #px
+		y_percent = 62 #y0 offset from the top
 		x_percent = 0 #x0 offset to the left of the center
 
 		#avoid potential problems:
@@ -313,11 +313,11 @@ class StevensBajaSAE(tk.Frame):
 		offset_ticks = 10 #px
 		offset_text = 20 #px
 		offset_main_label_x = 0 #px
-		offset_main_label_y = 75 #px
+		offset_main_label_y = 35 #px
 		dial_spacing = (math.pi / 3) #should be less than pi / 2
-		dial_radius = 150 #px
-		y_percent = 30 #y0 offset from the top
-		x_percent = 6 #x0 offset from the left
+		dial_radius = 75 #px
+		y_percent = 38 #y0 offset from the top
+		x_percent = 7 #x0 offset from the left
 		min_value_speed = 0
 		max_value_speed = 120
 		min_value_rpm = 0
@@ -556,7 +556,7 @@ class StevensBajaSAE(tk.Frame):
 		self.previous_lap_time_label.grid(row=0, column=3, sticky=N+S+E+W)
 		self.previous_lap_time.grid(row=1, column=3, sticky=N+S+E+W)
 		#create a space in the grid to house the canvas widgets:
-		row_spacing = 10
+		row_spacing = 8
 		self.temperature_1_header.grid(row=(row_spacing), column=0, sticky=N+S+E+W)
 		self.temperature_1.grid(row=(1 + row_spacing), column=0, sticky=N+S+E+W)
 		self.temperature_2_header.grid(row=(row_spacing), column=1, sticky=N+S+E+W)
