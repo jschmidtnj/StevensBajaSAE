@@ -48,7 +48,7 @@ lcd_2_d7        = 22
 lcd_2_backlight = 4
 
 # Initialize the LCD using the pins above.
-lcd_1 = LCD.Adafruit_CharLCD(lcd_2_rs, lcd_2_en, lcd_2_d4, lcd_2_d5, lcd_2_d6, lcd_2_d7, lcd_columns, lcd_rows, lcd_2_backlight)
+#lcd_2 = LCD.Adafruit_CharLCD(lcd_2_rs, lcd_2_en, lcd_2_d4, lcd_2_d5, lcd_2_d6, lcd_2_d7, lcd_columns, lcd_rows, lcd_2_backlight)
 
 
 '''
@@ -464,7 +464,10 @@ class StevensBajaSAE(tk.Frame):
 		#send data to the LCDs
 		lcd_1.clear()
 		#lcd_2.clear()
-		lcd_1.message(self.lcd_1_data)
+		lcd_1.create_char
+		(0, [0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f])
+		lcd.message(¨00¨)
+		#lcd_1.message(self.lcd_1_data)
 		#lcd_2.message(self.lcd_2_data)
 		
                 
