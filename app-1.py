@@ -31,11 +31,11 @@ lcd_1_d7        = 22
 lcd_1_backlight = 4
 
 # Define LCD column and row size for 16x2 LCD.
-lcd_columns = 16
-lcd_rows    = 2
+lcd_1_columns = 16
+lcd_1_rows    = 2
 
 # Initialize the LCD using the pins above.
-lcd_1 = LCD.Adafruit_CharLCD(lcd_1_rs, lcd_1_en, lcd_1_d4, lcd_1_d5, lcd_1_d6, lcd_1_d7, lcd_columns, lcd_rows, lcd_1_backlight)
+lcd_1 = LCD.Adafruit_CharLCD(lcd_1_rs, lcd_1_en, lcd_1_d4, lcd_1_d5, lcd_1_d6, lcd_1_d7, lcd_1_columns, lcd_1_rows, lcd_1_backlight)
 
 #LCD 2:
 # Raspberry Pi pin configuration:
@@ -47,8 +47,11 @@ lcd_2_d6        = 18
 lcd_2_d7        = 22
 lcd_2_backlight = 4
 
+lcd_2_columns = 16
+lcd_2_rows    = 2
+
 # Initialize the LCD using the pins above.
-#lcd_2 = LCD.Adafruit_CharLCD(lcd_2_rs, lcd_2_en, lcd_2_d4, lcd_2_d5, lcd_2_d6, lcd_2_d7, lcd_columns, lcd_rows, lcd_2_backlight)
+#lcd_2 = LCD.Adafruit_CharLCD(lcd_2_rs, lcd_2_en, lcd_2_d4, lcd_2_d5, lcd_2_d6, lcd_2_d7, lcd_2_columns, lcd_2_rows, lcd_2_backlight)
 
 
 '''
@@ -430,17 +433,29 @@ class StevensBajaSAE(tk.Frame):
 		self.seven_segment_display_1_data = 12.222
 		self.seven_segment_display_2_data = 13.222
 		self.seven_segment_display_3_data = 14.222
+		#adjust the fuel level:
+		self.fuel_level = self.fuel_level_starting_percentage - ((time.time() - self.last_fueling_time) / self.fuel_level_duration * 100)
 		#LCDs:
-		self.lcd_1_data = "Hello World\nLCD1..."
+		if self.fuel_level > 50:
+                    self.lcd_1_data = "Full: {0:.2f}% \n".format(self.fuel_level)
+		elif self.fuel_level > 25:
+                    self.lcd_1_data = "LOW: {0:.2f}% \n".format(self.fuel_level)
+		elif self.fuel_level > 5:
+                    self.lcd_1_data = "Refuel! {0:.2f}%\n".format(self.fuel_level)
+		else:
+                    self.lcd_1_data = "OUT OF FUEL\n"
+		self.num_boxes = int(self.fuel_level / 100 * lcd_1_columns)
+		num_blank = lcd_1_columns - self.num_boxes
+		for _ in range(self.num_boxes):
+                    self.lcd_1_data += ('\x00')
+		for _ in range(num_blank):
+                    self.lcd_1_data += ('\x01')
 		self.lcd_2_data = "Hello World\nLCD1..."
 
 		#working with Canvas - first delete everything from before:
 		(self.master).delete("all")
 		#build the dials:
 		self.build_dials()
-
-		#adjust the fuel level:
-		self.fuel_level = self.fuel_level_starting_percentage - ((time.time() - self.last_fueling_time) / self.fuel_level_duration * 100)
 
 		#build the fuel gauge:
 		self.build_fuel_gauge(self.fuel_level)
@@ -462,12 +477,9 @@ class StevensBajaSAE(tk.Frame):
 		seven_segment_display_1.write_display()
 		
 		#send data to the LCDs
-		lcd_1.clear()
-		#lcd_2.clear()
-		lcd_1.create_char
-		(0, [0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f])
-		lcd.message('\x00')
-		#lcd_1.message(self.lcd_1_data)
+		lcd_1.set_cursor(0,0)
+		#lcd_2.set_cursor(0,0)
+		lcd_1.message(self.lcd_1_data)
 		#lcd_2.message(self.lcd_2_data)
 		
                 
@@ -499,6 +511,12 @@ class StevensBajaSAE(tk.Frame):
 		current_time_font = Font(family="Arial", size=15)
 		
 		#other displays:
+		#LCD:
+		#box char set to 0 index
+		lcd_1.create_char(0, [0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f])
+		#blank char set to 1 index
+		lcd_1.create_char(1, [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])
+		#lcd_2.create_char(0, [0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f])
 		#SSD:
 		seven_segment_display_1.set_colon(False)
 		'''
