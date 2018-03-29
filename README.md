@@ -52,3 +52,4 @@ the i2c pinout: https://pinout.xyz/pinout/i2c#
 add submodule libraries: git submodule add https://github.com/adafruit/Adafruit_Python_CharLCD Adafruit_Python_CharLCD
 git submodule init
 git submodule update
+https://www.quinapalus.com/hd44780udg.html
