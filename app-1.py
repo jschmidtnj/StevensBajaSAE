@@ -423,7 +423,7 @@ class StevensBajaSAE(tk.Frame):
 		#print(input_data)
 		#configure all of the new data input:
 		#NEW DATA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		self.speed = 60 #for speedometer mph
+		self.speed = 120 #for speedometer mph
 		self.rpm = 2700 #for rpm dial
 		self.temp_1 = 200 #temp for engine
 		self.temp_2 = 500 #temp for engine perimeter
@@ -441,7 +441,7 @@ class StevensBajaSAE(tk.Frame):
 		#if start was hit
 		if self.previous_laps != []:
                     self.fuel_level = self.fuel_level - (math.log(self.rpm) * self.refresh_time / (self.fuel_tank_size * 200))
-                    distance_data = float((self.speed / 3600000 * self.refresh_time))
+                    distance_data = float((self.speed / 3600000 * self.refresh_time * 8.65)) #delay for program time use (ms)
                     self.lap_distance_data += distance_data
                     self.total_distance_data += distance_data
 		else:
