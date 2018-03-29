@@ -16,7 +16,7 @@ sudo nano /boot/config.txt
 display_rotate=1
 sudo nano /home/pi/Desktop/fliptouch.sh
 xinput --set-prop 'FT5406 memory based driver' 'Coordinate Transformation Matrix' 0 1 0 -1 0 1 0 0 1
+python3 /home/pi/Desktop/StevensBajaSAE/app-1.py
 sudo chmod 777 /home/pi/Desktop/fliptouch.sh
 sudo nano ~/.config/lxsession/LXDE-pi/autostart
-@/home/pi/Desktop/fliptouch.sh
-sudo reboot
+@/home/pi/Desktop/StevensBajaSAE/startscript.sh

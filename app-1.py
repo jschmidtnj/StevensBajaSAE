@@ -191,15 +191,16 @@ class StevensBajaSAE(tk.Frame):
 			#create the text
 			(self.master).create_text((x0_background_guage + delta_x), (y0_background_guage + delta_y + text_offset), text=("{0:.0f}".format(current_tick_label)), font=text_label_font)
 
-		#create current level label
-		(self.master).create_text((x1_indicator_guage + current_fuel_level_x_offset), (y0_background_guage + (height_of_fuelguage / 2)), text=("{0:.02f}%".format(fuel_level)), font=current_fuel_level_indicator_font)
-
 		#create the main label
 		(self.master).create_text((x0_background_guage + (width_of_fuelguage / 2) - offset_main_label_x), (y0_background_guage - offset_main_label_y), text=main_label, font=main_label_font)
 
 		#create the out of fuel label
 		if fuel_level < out_of_fuel_threshold:
 			(self.master).create_text((x0_background_guage + (width_of_fuelguage / 2)), (y0_background_guage + (height_of_fuelguage / 2)), text=out_of_fuel_label, font=out_of_fuel_font)
+		else:
+                    #create current level label
+                    (self.master).create_text((x1_indicator_guage + current_fuel_level_x_offset), (y0_background_guage + (height_of_fuelguage / 2)), text=("{0:.02f}%".format(fuel_level)), font=current_fuel_level_indicator_font)
+
 
 	def create_tickmarks_and_labels(self, min_value, max_value, dial_spacing, x0_dial, y0_dial, dial_radius, offset_ticks, offset_text, num_labels, text_label_font):
 			#this method makes the tickmarks and labels. labels are defined by the x and y offsets * some value constant * -1
@@ -374,7 +375,7 @@ class StevensBajaSAE(tk.Frame):
 		self.lap_count.config(text='Lap {0:.0f}'.format(current_lap_count))
 
 	def added_fuel(self, master):
-		self.last_fueling_time = time.time()
+		self.fuel_level = 100
 
 	def reset_gui(self, master):
                 #reset the lap info
@@ -387,7 +388,10 @@ class StevensBajaSAE(tk.Frame):
                 self.sum_previous_laps = 0
                 #send this data to mysql db
                 self.previous_laps = []
-
+    
+	def mode_toggle(self, master):
+            return false
+        
 	def new_lap(self, master):
 		if self.first_new_lap_click == True:
 			self.first_new_lap_click = False
@@ -395,6 +399,7 @@ class StevensBajaSAE(tk.Frame):
 			#get current time
 			self.initial_time = time.time()
 		self.previous_laps.append(self.current_lap)
+		self.lap_distance_data = 0
 		self.current_lap = 0
 		self.sum_previous_laps = sum(self.previous_laps)
 
@@ -418,8 +423,8 @@ class StevensBajaSAE(tk.Frame):
 		#print(input_data)
 		#configure all of the new data input:
 		#NEW DATA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		self.speed = 70 #for speedometer
-		self.rpm = 500 #for rpm dial
+		self.speed = 60 #for speedometer mph
+		self.rpm = 2700 #for rpm dial
 		self.temp_1 = 200 #temp for engine
 		self.temp_2 = 500 #temp for engine perimeter
 		self.other_data_input = "This is more data..." #extra data that can be added
@@ -427,14 +432,22 @@ class StevensBajaSAE(tk.Frame):
 		#add data to the labels:
 		self.temperature_1.config(text='{0:.2f}'.format(self.temp_1))
 		self.temperature_2.config(text='{0:.2f}'.format(self.temp_2))
-		self.other_data.config(text='{0}'.format(self.other_data_input))
 		#data for the displays
 		#seven-segment displays:
-		self.seven_segment_display_1_data = 12.222
-		self.seven_segment_display_2_data = 13.222
+		self.seven_segment_display_1_data = float(self.rpm)
+		self.seven_segment_display_2_data = float(self.speed)
 		self.seven_segment_display_3_data = 14.222
 		#adjust the fuel level:
-		self.fuel_level = self.fuel_level_starting_percentage - ((time.time() - self.last_fueling_time) / self.fuel_level_duration * 100)
+		#if start was hit
+		if self.previous_laps != []:
+                    self.fuel_level = self.fuel_level - (math.log(self.rpm) * self.refresh_time / (self.fuel_tank_size * 200))
+                    distance_data = float((self.speed / 3600000 * self.refresh_time))
+                    self.lap_distance_data += distance_data
+                    self.total_distance_data += distance_data
+		else:
+                    self.fuel_level = self.fuel_level_starting_percentage
+                    self.lap_distance_data = 0
+                    self.total_distance_data = 0
 		#LCDs:
 		if self.fuel_level > 50:
                     self.lcd_1_data = "Full: {0:.2f}% \n".format(self.fuel_level)
@@ -443,7 +456,7 @@ class StevensBajaSAE(tk.Frame):
 		elif self.fuel_level > 5:
                     self.lcd_1_data = "Refuel! {0:.2f}%\n".format(self.fuel_level)
 		else:
-                    self.lcd_1_data = "OUT OF FUEL\n"
+                    self.lcd_1_data = "OUT OF FUEL   \n"
 		self.num_boxes = int(self.fuel_level / 100 * lcd_1_columns)
 		num_blank = lcd_1_columns - self.num_boxes
 		for _ in range(self.num_boxes):
@@ -451,6 +464,10 @@ class StevensBajaSAE(tk.Frame):
 		for _ in range(num_blank):
                     self.lcd_1_data += ('\x01')
 		self.lcd_2_data = "Hello World\nLCD1..."
+		
+		#send distance data
+		self.lap_distance.config(text='{0:.2f}'.format(self.lap_distance_data))
+		self.total_distance.config(text='{0:.2f}'.format(self.total_distance_data))
 
 		#working with Canvas - first delete everything from before:
 		(self.master).delete("all")
@@ -469,7 +486,7 @@ class StevensBajaSAE(tk.Frame):
 		seven_segment_display_2.clear()
 		seven_segment_display_3.clear()
 		'''
-		seven_segment_display_1.print_float(self.seven_segment_display_1_data, decimal_digits=2)
+		seven_segment_display_1.print_float(self.seven_segment_display_1_data, decimal_digits=0)
 		'''
 		seven_segment_display_2.print_float(self.seven_segment_display_2_data, decimal_digits=2)
 		seven_segment_display_3.print_float(self.seven_segment_display_3_data, decimal_digits=2)
@@ -484,7 +501,7 @@ class StevensBajaSAE(tk.Frame):
 		
                 
 		#refresh data:
-		(self.master).after(10, self.refresh)
+		(self.master).after(self.refresh_time, self.refresh)
 
 	def __init__(self, master):
 		#initialize the app - the size, title, etc.
@@ -528,24 +545,28 @@ class StevensBajaSAE(tk.Frame):
 		#self.button_2_state = False #false = off
 
 		#vars for widgets:
+		self.fuel_tank_size = 10 #gallons
+		self.refresh_time = 10 #ms
+		self.lap_distance_data = 0
+		self.total_distance_data = 0
 		self.current_gear = "P"
 		self.lap_count = 0
 		self.previous_laps = list()
 		self.current_lap = 0
 		self.sum_previous_laps = 0
 		self.first_new_lap_click = True
-		self.fuel_level_starting_percentage = 100 #percent (%)
-		self.fuel_level_duration = 120 #seconds
 		self.last_fueling_time = time.time()
+		self.fuel_level_starting_percentage = 100
+		self.fuel_level = self.fuel_level_starting_percentage
 
 		#create the widgets:
 		#time widgets
 		self.total_time = Label(master, font = time_font, bg=time_background, text = "n/a")
-		self.total_time_label = Label(master, font = header_font, bg=header_background, text = "Total Time Elapsed")
+		self.total_time_label = Label(master, font = header_font, bg=header_background, text = "Total")
 		self.lap_time = Label(master, font = time_font, bg=time_background, text = "n/a")
-		self.lap_time_label = Label(master, font = header_font, bg=header_background, text = "Current Lap Time")
+		self.lap_time_label = Label(master, font = header_font, bg=header_background, text = "Current")
 		self.previous_lap_time = Label(master, font = time_font, bg=time_background)
-		self.previous_lap_time_label = Label(master, font = header_font, bg=header_background, text = "Previous Lap Time")
+		self.previous_lap_time_label = Label(master, font = header_font, bg=header_background, text = "Previous")
 		#lap widget
 		self.lap_count = Label(master, font = lap_count_font, bg=header_background, text="0")
 		self.new_lap_button = tk.Button(master, text="Start", font = time_font, bg = time_background)
@@ -553,12 +574,11 @@ class StevensBajaSAE(tk.Frame):
 		self.new_lap_button.bind('<ButtonPress>', self.new_lap)
 
 		#Temperature and other diagnostic data
-		self.temperature_1_header = Label(master, font = header_font, bg=header_background, text = "Engine Temp")
+		self.temperature_1_header = Label(master, font = header_font, bg=header_background, text = "CRS-1")
 		self.temperature_1 = Label(master, font = diagnostic_font, bg=diagnostic_background)
-		self.temperature_2_header = Label(master, font = header_font, bg=header_background, text = "Engine-2 Temp")
+		self.temperature_2_header = Label(master, font = header_font, bg=header_background, text = "CRS-2")
 		self.temperature_2 = Label(master, font = diagnostic_font, bg=diagnostic_background)
-		self.other_data_header = Label(master, font = header_font, bg=header_background, text = "Other Data")
-		self.other_data = Label(master, font = diagnostic_font, bg=diagnostic_background)
+		self.modetoggle = tk.Button(master, text = "Mode", font = diagnostic_font, bg=diagnostic_background)
 		self.current_time = Label(master, font = current_time_font, bg=current_time_background)
 		self.reset_button = tk.Button(master, text = "Reset", font = diagnostic_font, bg=diagnostic_background)
 		#when button is pressed go to the reset_gui function
@@ -566,26 +586,36 @@ class StevensBajaSAE(tk.Frame):
 		#adding fuel:
 		self.add_fuel = tk.Button(master, text = "Add Fuel", font = diagnostic_font, bg=diagnostic_background)
 		self.add_fuel.bind('<ButtonPress>', self.added_fuel)
+		self.modetoggle.bind('<ButtonPress>', self.mode_toggle)
+		self.lap_distance_header = Label(master, font = header_font, bg=header_background, text = "Lap")
+		self.lap_distance = Label(master, font = diagnostic_font, bg=diagnostic_background)
+		self.total_distance_header = Label(master, font = header_font, bg=header_background, text = "Total")
+		self.total_distance = Label(master, font = diagnostic_font, bg=diagnostic_background)
+		
 
 		#place the widgets
-		self.total_time_label.grid(row=0, column=0, sticky=N+S+E+W)
-		self.total_time.grid(row=1, column=0, sticky=N+S+E+W)
-		self.lap_time_label.grid(row=0, column=1, sticky=N+S+E+W)
-		self.lap_time.grid(row=1, column=1, sticky=N+S+E+W)
-		self.lap_count.grid(row=0, column=2, sticky=N+S+E+W)
-		self.new_lap_button.grid(row=1, column = 2, sticky=N+S+E+W)
-		self.previous_lap_time_label.grid(row=0, column=3, sticky=N+S+E+W)
-		self.previous_lap_time.grid(row=1, column=3, sticky=N+S+E+W)
+		self.current_time.grid(row=1, column=0, sticky=N+S+E+W)
+		self.total_time_label.grid(row=0, column=3, sticky=N+S+E+W)
+		self.total_time.grid(row=1, column=3, sticky=N+S+E+W)
+		self.lap_time_label.grid(row=0, column=2, sticky=N+S+E+W)
+		self.lap_time.grid(row=1, column=2, sticky=N+S+E+W)
+		self.lap_count.grid(row=0, column=4, sticky=N+S+E+W)
+		self.new_lap_button.grid(row=0, column = 0, sticky=N+S+E+W)
+		self.previous_lap_time_label.grid(row=0, column=1, sticky=N+S+E+W)
+		self.previous_lap_time.grid(row=1, column=1, sticky=N+S+E+W)
+		self.reset_button.grid(row=1, column=4, sticky=N+S+E+W)
 		#create a space in the grid to house the canvas widgets:
 		row_spacing = 8
 		self.temperature_1_header.grid(row=(row_spacing), column=0, sticky=N+S+E+W)
 		self.temperature_1.grid(row=(1 + row_spacing), column=0, sticky=N+S+E+W)
 		self.temperature_2_header.grid(row=(row_spacing), column=1, sticky=N+S+E+W)
 		self.temperature_2.grid(row=(1 + row_spacing), column=1, sticky=N+S+E+W)
-		self.other_data.grid(row=(row_spacing), column=2, sticky=N+S+E+W)
+		self.modetoggle.grid(row=(row_spacing), column=2, sticky=N+S+E+W)
 		self.add_fuel.grid(row=(1 + row_spacing), column=2, sticky=N+S+E+W)
-		self.current_time.grid(row=(row_spacing), column=3, sticky=N+S+E+W)
-		self.reset_button.grid(row=(1 + row_spacing), column=3, sticky=N+S+E+W)
+		self.lap_distance_header.grid(row=(row_spacing), column=3, sticky=N+S+E+W)
+		self.lap_distance.grid(row=(1 + row_spacing), column=3, sticky=N+S+E+W)
+		self.total_distance_header.grid(row=(row_spacing), column=4, sticky=N+S+E+W)
+		self.total_distance.grid(row=(1 + row_spacing), column=4, sticky=N+S+E+W)
 
 		#allow for self resizing:
 		for x in range(Grid.grid_size(master)[0]):
