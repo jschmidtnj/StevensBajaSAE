@@ -54,12 +54,10 @@ lcd_2_rows    = 2
 #lcd_2 = LCD.Adafruit_CharLCD(lcd_2_rs, lcd_2_en, lcd_2_d4, lcd_2_d5, lcd_2_d6, lcd_2_d7, lcd_2_columns, lcd_2_rows, lcd_2_backlight)
 
 
-'''
 port = "/dev/USB0" #ttyS0 on other
-rate = 9600
+rate = 115200
 ser = serial.Serial(port, rate)
 ser.flushInput()
-'''
 
 
 #initialize the seven-segment displays:
@@ -67,9 +65,9 @@ seven_segment_display_1 = SevenSegment.SevenSegment(address=0x70)
 seven_segment_display_1.begin()
 #3 seven segment displays
 '''
-seven_segment_display_2 = SevenSegment.SevenSegment()
+seven_segment_display_2 = SevenSegment.SevenSegment(address=0x60)
 seven_segment_display_2.begin()
-seven_segment_display_3 = SevenSegment.SevenSegment()
+seven_segment_display_3 = SevenSegment.SevenSegment(address=0x50)
 seven_segment_display_3.begin()
 '''
 
@@ -77,8 +75,8 @@ class StevensBajaSAE(tk.Frame):
 	"""This is the class for the application window, the app being the tkinter setup"""
 	def build_driving_mode_indicator(self, driving_mode):
                 #styling:
-                main_label_font = Font(family="Arial", size=30)
-                secondary_label_font = Font(family="Arial", size=12)
+		main_label_font = Font(family="Arial", size=30)
+		secondary_label_font = Font(family="Arial", size=12)
 		offset_secondary_label = 35 #px
 		y_percent = 30 #y0 offset from the top
 		x_percent = 0 #x0 offset to the left of the center
@@ -146,7 +144,7 @@ class StevensBajaSAE(tk.Frame):
 			fuel_level = 0
 		elif fuel_level > 100:
 			fuel_level = 100
-
+		
 		#background_guage
 		x0_background_guage = (self.width * (.5 - x_percent / 100)) - (width_of_fuelguage / 2)
 		y0_background_guage = self.height * (y_percent / 100)
@@ -198,7 +196,7 @@ class StevensBajaSAE(tk.Frame):
 		if fuel_level < out_of_fuel_threshold:
 			(self.master).create_text((x0_background_guage + (width_of_fuelguage / 2)), (y0_background_guage + (height_of_fuelguage / 2)), text=out_of_fuel_label, font=out_of_fuel_font)
 		else:
-        	#create current level label
+            #create current level label
             (self.master).create_text((x1_indicator_guage + current_fuel_level_x_offset), (y0_background_guage + (height_of_fuelguage / 2)), text=("{0:.02f}%".format(fuel_level)), font=current_fuel_level_indicator_font)
 
 
@@ -225,47 +223,47 @@ class StevensBajaSAE(tk.Frame):
 					delta_x_offset_text = abs(math.cos(phi) * (dial_radius + offset_text)) * -1
 					delta_y_offset_text = abs(math.sin(phi) * (dial_radius + offset_text)) * 1
 			#if less than pi
-		elif (radians_from_min + dial_spacing) <= (math.pi):
-			phi = radians_from_min + dial_spacing - (math.pi / 2)
-			delta_x_on_circle = abs(math.cos(phi) * dial_radius) * -1
-			delta_y_on_circle = abs(math.sin(phi) * dial_radius) * -1
-			delta_x_offset_ticks = abs(math.cos(phi) * (dial_radius - offset_ticks)) * -1
-			delta_y_offset_ticks = abs(math.sin(phi) * (dial_radius - offset_ticks)) * -1
-			delta_x_offset_text = abs(math.cos(phi) * (dial_radius + offset_text)) * -1
-			delta_y_offset_text = abs(math.sin(phi) * (dial_radius + offset_text)) * -1
+			elif (radians_from_min + dial_spacing) <= (math.pi):
+				phi = radians_from_min + dial_spacing - (math.pi / 2)
+				delta_x_on_circle = abs(math.cos(phi) * dial_radius) * -1
+				delta_y_on_circle = abs(math.sin(phi) * dial_radius) * -1
+				delta_x_offset_ticks = abs(math.cos(phi) * (dial_radius - offset_ticks)) * -1
+				delta_y_offset_ticks = abs(math.sin(phi) * (dial_radius - offset_ticks)) * -1
+				delta_x_offset_text = abs(math.cos(phi) * (dial_radius + offset_text)) * -1
+				delta_y_offset_text = abs(math.sin(phi) * (dial_radius + offset_text)) * -1
 			#if less than 3 pi / 2
-		elif (radians_from_min + dial_spacing) <= (math.pi * 3 / 2):
-			phi = radians_from_min + dial_spacing - math.pi
-			delta_x_on_circle = abs(math.sin(phi) * dial_radius) * 1
-			delta_y_on_circle = abs(math.cos(phi) * dial_radius) * -1
-			delta_x_offset_ticks = abs(math.sin(phi) * (dial_radius - offset_ticks)) * 1
-			delta_y_offset_ticks = abs(math.cos(phi) * (dial_radius - offset_ticks)) * -1
-			delta_x_offset_text = abs(math.sin(phi) * (dial_radius + offset_text)) * 1
-			delta_y_offset_text = abs(math.cos(phi) * (dial_radius + offset_text)) * -1
+			elif (radians_from_min + dial_spacing) <= (math.pi * 3 / 2):
+				phi = radians_from_min + dial_spacing - math.pi
+				delta_x_on_circle = abs(math.sin(phi) * dial_radius) * 1
+				delta_y_on_circle = abs(math.cos(phi) * dial_radius) * -1
+				delta_x_offset_ticks = abs(math.sin(phi) * (dial_radius - offset_ticks)) * 1
+				delta_y_offset_ticks = abs(math.cos(phi) * (dial_radius - offset_ticks)) * -1
+				delta_x_offset_text = abs(math.sin(phi) * (dial_radius + offset_text)) * 1
+				delta_y_offset_text = abs(math.cos(phi) * (dial_radius + offset_text)) * -1
 			#if less than the max point
-		else:
-			if (radians_from_min + dial_spacing) >= ((2 * math.pi) - dial_spacing):
-				delta_x_on_circle = abs(math.sin(dial_spacing) * dial_radius) * 1
-				delta_y_on_circle = abs(math.cos(dial_spacing) * dial_radius) * 1
-				delta_x_offset_ticks = abs(math.sin(dial_spacing) * (dial_radius - offset_ticks)) * 1
-				delta_y_offset_ticks = abs(math.cos(dial_spacing) * (dial_radius - offset_ticks)) * 1
-				delta_x_offset_text = abs(math.sin(dial_spacing) * (dial_radius + offset_text)) * 1
-				delta_y_offset_text = abs(math.cos(dial_spacing) * (dial_radius + offset_text)) * 1
 			else:
-				phi = radians_from_min + dial_spacing - (math.pi * 3 / 2)
-				delta_x_on_circle = abs(math.cos(phi) * dial_radius) * 1
-				delta_y_on_circle = abs(math.sin(phi) * dial_radius) * 1
-				delta_x_offset_ticks = abs(math.cos(phi) * (dial_radius - offset_ticks)) * 1
-				delta_y_offset_ticks = abs(math.sin(phi) * (dial_radius - offset_ticks)) * 1
-				delta_x_offset_text = abs(math.cos(phi) * (dial_radius + offset_text)) * 1
-				delta_y_offset_text = abs(math.sin(phi) * (dial_radius + offset_text)) * 1
+				if (radians_from_min + dial_spacing) >= ((2 * math.pi) - dial_spacing):
+					delta_x_on_circle = abs(math.sin(dial_spacing) * dial_radius) * 1
+					delta_y_on_circle = abs(math.cos(dial_spacing) * dial_radius) * 1
+					delta_x_offset_ticks = abs(math.sin(dial_spacing) * (dial_radius - offset_ticks)) * 1
+					delta_y_offset_ticks = abs(math.cos(dial_spacing) * (dial_radius - offset_ticks)) * 1
+					delta_x_offset_text = abs(math.sin(dial_spacing) * (dial_radius + offset_text)) * 1
+					delta_y_offset_text = abs(math.cos(dial_spacing) * (dial_radius + offset_text)) * 1
+				else:
+					phi = radians_from_min + dial_spacing - (math.pi * 3 / 2)
+					delta_x_on_circle = abs(math.cos(phi) * dial_radius) * 1
+					delta_y_on_circle = abs(math.sin(phi) * dial_radius) * 1
+					delta_x_offset_ticks = abs(math.cos(phi) * (dial_radius - offset_ticks)) * 1
+					delta_y_offset_ticks = abs(math.sin(phi) * (dial_radius - offset_ticks)) * 1
+					delta_x_offset_text = abs(math.cos(phi) * (dial_radius + offset_text)) * 1
+					delta_y_offset_text = abs(math.sin(phi) * (dial_radius + offset_text)) * 1
 
-				center_point_x = x0_dial + dial_radius
-				center_point_y = y0_dial + dial_radius
-		#create the tick marks
-		(self.master).create_line((center_point_x + delta_x_on_circle), (center_point_y + delta_y_on_circle), (center_point_x + delta_x_offset_ticks), (center_point_y + delta_y_offset_ticks))
-		#create the text
-		(self.master).create_text((center_point_x + delta_x_offset_text), (center_point_y + delta_y_offset_text), text=("{0:.0f}".format(current_tick_label)), font=text_label_font)
+			center_point_x = x0_dial + dial_radius
+			center_point_y = y0_dial + dial_radius
+			#create the tick marks
+			(self.master).create_line((center_point_x + delta_x_on_circle), (center_point_y + delta_y_on_circle), (center_point_x + delta_x_offset_ticks), (center_point_y + delta_y_offset_ticks))
+			#create the text
+			(self.master).create_text((center_point_x + delta_x_offset_text), (center_point_y + delta_y_offset_text), text=("{0:.0f}".format(current_tick_label)), font=text_label_font)
 
 	#add the needles: (x0_dial is the diagonal top left point when making the circle)
 	def create_needle(self, current_value, min_value, max_value, dial_spacing, x0_dial, y0_dial, dial_radius, thickness, name_of_guage, font_main_label, offset_main_label_x, offset_main_label_y):
@@ -299,9 +297,8 @@ class StevensBajaSAE(tk.Frame):
 				phi = radians_from_min + dial_spacing - (math.pi * 3 / 2)
 				delta_x = abs(math.cos(phi) * dial_radius) * 1
 				delta_y = abs(math.sin(phi) * dial_radius) * 1
-				center_point_x = x0_dial + dial_radius
-				center_point_y = y0_dial + dial_radius
-
+		center_point_x = x0_dial + dial_radius
+		center_point_y = y0_dial + dial_radius
 		(self.master).create_line((center_point_x + delta_x), (center_point_y + delta_y), center_point_x, center_point_y, width=thickness)
 
 		#create the main label:
@@ -367,13 +364,13 @@ class StevensBajaSAE(tk.Frame):
 		#if there are no previous laps:
 		else:
 			self.previous_lap_time.config(text='n/a')
-			#add the current time:
-			the_time_and_date = str(datetime.now())
-			the_time = the_time_and_date[11:]
-			the_date = the_time_and_date[:10]
-			self.current_time.config(text='{0}'.format(the_time[:11]))
-			current_lap_count = len(self.previous_laps)
-			self.lap_count.config(text='Lap {0:.0f}'.format(current_lap_count))
+		#add the current time:
+		the_time_and_date = str(datetime.now())
+		the_time = the_time_and_date[11:]
+		the_date = the_time_and_date[:10]
+		self.current_time.config(text='{0}'.format(the_time[:11]))
+		current_lap_count = len(self.previous_laps)
+		self.lap_count.config(text='Lap {0:.0f}'.format(current_lap_count))
 
 	def added_fuel(self, master):
 		self.fuel_level = 100
@@ -389,20 +386,20 @@ class StevensBajaSAE(tk.Frame):
         self.sum_previous_laps = 0
         #send this data to mysql db
         self.previous_laps = []
-
-    def mode_toggle(self, master):
-    	return false
-
+    
+	def mode_toggle(self, master):
+        return false
+        
 	def new_lap(self, master):
 		if self.first_new_lap_click == True:
 			self.first_new_lap_click = False
 			self.new_lap_button.config(text="New Lap")
 			#get current time
 			self.initial_time = time.time()
-			self.previous_laps.append(self.current_lap)
-			self.lap_distance_data = 0
-			self.current_lap = 0
-			self.sum_previous_laps = sum(self.previous_laps)
+		self.previous_laps.append(self.current_lap)
+		self.lap_distance_data = 0
+		self.current_lap = 0
+		self.sum_previous_laps = sum(self.previous_laps)
 
 	def refresh(self):
 		#TIME:
@@ -418,18 +415,20 @@ class StevensBajaSAE(tk.Frame):
 		#etc...
 		if self.button_1_state:
 			print("Button 1 Pressed")
-
+		
 		#refresh the data input
 		#input_data = ser.readline()
 		#print(input_data)
 		#configure all of the new data input:
 		#NEW DATA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		self.speed = 120 #for speedometer mph
-		self.rpm = 2700 #for rpm dial
-		self.temp_1 = 200 #temp for engine
-		self.temp_2 = 500 #temp for engine perimeter
-		self.other_data_input = "This is more data..." #extra data that can be added
-		self.driving_mode = 0 #0 = forward, 1 = neutral, 2 = reverse
+		data = ser.readline()
+		#data in the form of:speed,rpm,temp_1,temp_2,driving_mode
+		[x.strip() for x in data.split(',')] #split by comma
+		self.speed = data[0] #for speedometer mph
+		self.rpm = data[1] #for rpm dial
+		self.temp_1 = data[2] #temp for engine
+		self.temp_2 = data[3] #temp for engine perimeter
+		self.driving_mode = data[4] #0 = forward, 1 = neutral, 2 = reverse
 		#add data to the labels:
 		self.temperature_1.config(text='{0:.2f}'.format(self.temp_1))
 		self.temperature_2.config(text='{0:.2f}'.format(self.temp_2))
@@ -441,14 +440,15 @@ class StevensBajaSAE(tk.Frame):
 		#adjust the fuel level:
 		#if start was hit
 		if self.previous_laps != []:
-			self.fuel_level = self.fuel_level - (math.log(self.rpm) * self.refresh_time / (self.fuel_tank_size * 200))
-            distance_data = float((self.speed / 3600000 * self.refresh_time * 8.65)) #delay for program time use (ms)
-            self.lap_distance_data += distance_data
-            self.total_distance_data += distance_data
-        else:
-        	self.fuel_level = self.fuel_level_starting_percentage
-        	self.lap_distance_data = 0
-        	self.total_distance_data = 0
+			#ln function of rpm requires three constants that need to be solved for somehow
+			self.fuel_level = self.fuel_level - ((.2*math.log(self.rpm) + .05) * self.refresh_time / (self.fuel_tank_size * 40))
+			distance_data = float((self.speed / 3600000 * self.refresh_time * 8.65)) #delay for program time use (ms)
+			self.lap_distance_data += distance_data
+			self.total_distance_data += distance_data
+		else:
+			self.fuel_level = self.fuel_level_starting_percentage
+			self.lap_distance_data = 0
+			self.total_distance_data = 0
 		#LCDs:
 		if self.fuel_level > 50:
 			self.lcd_1_data = "Full: {0:.2f}% \n".format(self.fuel_level)
@@ -458,14 +458,14 @@ class StevensBajaSAE(tk.Frame):
 			self.lcd_1_data = "Refuel! {0:.2f}%\n".format(self.fuel_level)
 		else:
 			self.lcd_1_data = "OUT OF FUEL   \n"
-			self.num_boxes = int(self.fuel_level / 100 * lcd_1_columns)
-			num_blank = lcd_1_columns - self.num_boxes
+		self.num_boxes = int(self.fuel_level / 100 * lcd_1_columns)
+		num_blank = lcd_1_columns - self.num_boxes
 		for _ in range(self.num_boxes):
 			self.lcd_1_data += ('\x00')
 		for _ in range(num_blank):
 			self.lcd_1_data += ('\x01')
 		self.lcd_2_data = "Hello World\nLCD1..."
-
+		
 		#send distance data
 		self.lap_distance.config(text='{0:.2f}'.format(self.lap_distance_data))
 		self.total_distance.config(text='{0:.2f}'.format(self.total_distance_data))
@@ -500,7 +500,7 @@ class StevensBajaSAE(tk.Frame):
 		lcd_1.message(self.lcd_1_data)
 		#lcd_2.message(self.lcd_2_data)
 		
-
+                
 		#refresh data:
 		(self.master).after(self.refresh_time, self.refresh)
 
@@ -540,7 +540,7 @@ class StevensBajaSAE(tk.Frame):
 		'''
 		seven_segment_display_2.set_colon(False)
 		seven_segment_display_3.set_colon(False)
-		'''
+                '''
 		#Pushbuttons:
 		self.button_1_state = False #false = off
 		#self.button_2_state = False #false = off
@@ -595,15 +595,15 @@ class StevensBajaSAE(tk.Frame):
 		
 
 		#place the widgets
-		self.current_time.grid(row=1, column=0, sticky=N+S+E+W)
-		self.total_time_label.grid(row=0, column=3, sticky=N+S+E+W)
-		self.total_time.grid(row=1, column=3, sticky=N+S+E+W)
-		self.lap_time_label.grid(row=0, column=2, sticky=N+S+E+W)
-		self.lap_time.grid(row=1, column=2, sticky=N+S+E+W)
-		self.lap_count.grid(row=0, column=4, sticky=N+S+E+W)
 		self.new_lap_button.grid(row=0, column = 0, sticky=N+S+E+W)
+		self.current_time.grid(row=1, column=0, sticky=N+S+E+W)
 		self.previous_lap_time_label.grid(row=0, column=1, sticky=N+S+E+W)
 		self.previous_lap_time.grid(row=1, column=1, sticky=N+S+E+W)
+		self.lap_time_label.grid(row=0, column=2, sticky=N+S+E+W)
+		self.lap_time.grid(row=1, column=2, sticky=N+S+E+W)
+		self.total_time_label.grid(row=0, column=3, sticky=N+S+E+W)
+		self.total_time.grid(row=1, column=3, sticky=N+S+E+W)
+		self.lap_count.grid(row=0, column=4, sticky=N+S+E+W)
 		self.reset_button.grid(row=1, column=4, sticky=N+S+E+W)
 		#create a space in the grid to house the canvas widgets:
 		row_spacing = 8
