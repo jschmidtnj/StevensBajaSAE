@@ -9,6 +9,57 @@ from tkinter.font import Font
 from Adafruit_LED_Backpack import SevenSegment
 import Adafruit_CharLCD as LCD
 import RPi.GPIO as GPIO
+import peewee
+from peewee import *
+#peewee is for mysql stuff
+
+#MySQL database
+db = MySQLDatabase('StevensBajaSAEData', user='car', passwd='data')
+
+#create 2 database classes
+class RealTimeData(Model):
+    rpm = CharField()
+    speed = CharField()
+    fuel_level = CharField()
+    temp_1 = CharField()
+    temp_2 = CharField()
+    lap_distance = CharField()
+    total_distance = CharField()
+    driving_mode = CharField()
+    previous_lap_time = CharField()
+    current_lap_time = CharField()
+    total_time = CharField()
+    lap_count = CharField()
+    current_time = CharField()
+
+    class Meta:
+        database = db
+
+class PreviousLapSummary(Model):
+	previous_lap_time = CharField()
+	average_rpm = CharField()
+	average_speed = CharField()
+	total_time = CharField()
+	lap_count = CharField()
+	current_time = CharField()
+	average_temp_1 = CharField()
+	average_temp_2 = CharField()
+
+	class Meta:
+        database = db
+
+class RaceSummary(Model):
+	lap_count = CharField()
+	total_time = CharField()
+	average_rpm = CharField()
+	average_speed = CharField()
+	average_temp_1 = CharField()
+	average_temp_2 = CharField()
+
+	class Meta:
+		database = db
+
+db.create_tables([RealTimeData, PreviousLapSummary, RaceSummary])
 
 #setup for buttons:
 GPIO.setmode(GPIO.BCM)
@@ -73,6 +124,30 @@ seven_segment_display_3.begin()
 
 class StevensBajaSAE(tk.Frame):
 	"""This is the class for the application window, the app being the tkinter setup"""
+	def on_closing(self):
+		if messagebox.askokcancel("Quit", "Do you want to quit?"):
+			#send data to the database
+			lap_count = len(self.previous_laps) + 1
+			average_rpm_data = 0
+			average_speed_data = 0
+			average_temp_1_data = 0
+			average_temp_2_data = 0
+			count = 0
+			for datapoint in PreviousLapSummary.select():
+				average_rpm += datapoint.rpm
+				average_speed_data += datapoint.speed
+				average_temp_1_data += datapoint.temp_1
+				average_temp_2_data += datapoint.temp_2
+				count += 1
+			average_rpm_data /= count
+			average_speed_data /= count
+			average_temp_1_data /= count
+			average_temp_2_data /= count
+			race_summary_entry = RaceSummary.create(average_rpm = average_rpm_data, average_speed = average_speed_data, total_time = self.total_time, lap_count = lap_count, average_temp_1 = average_temp_1_data, average_temp_2 = average_temp_2_data)
+			race_summary_entry.save()
+			#close window
+        	root.destroy()
+
 	def build_driving_mode_indicator(self, driving_mode):
                 #styling:
 		main_label_font = Font(family="Arial", size=30)
@@ -396,6 +471,24 @@ class StevensBajaSAE(tk.Frame):
 			self.new_lap_button.config(text="New Lap")
 			#get current time
 			self.initial_time = time.time()
+		lap_count = len(self.previous_laps) + 1
+		average_rpm_data = 0
+		average_speed_data = 0
+		average_temp_1_data = 0
+		average_temp_2_data = 0
+		count = 0
+		for datapoint in RealTimeData.select().where(RealTimeData.lap_count == lap_count):
+			average_rpm += datapoint.rpm
+			average_speed_data += datapoint.speed
+			average_temp_1_data += datapoint.temp_1
+			average_temp_2_data += datapoint.temp_2
+			count += 1
+		average_rpm_data /= count
+		average_speed_data /= count
+		average_temp_1_data /= count
+		average_temp_2_data /= count
+		previous_lap_entry = PreviousLapSummary.create(previous_lap_time = self.current_lap, average_rpm = average_rpm_data, average_speed = average_speed_data, total_time = self.total_time, lap_count = lap_count, current_time = self.current_time, average_temp_1 = average_temp_1_data, average_temp_2 = average_temp_2_data)
+		previous_lap_entry.save()
 		self.previous_laps.append(self.current_lap)
 		self.lap_distance_data = 0
 		self.current_lap = 0
@@ -420,15 +513,15 @@ class StevensBajaSAE(tk.Frame):
 		#input_data = ser.readline()
 		#print(input_data)
 		#configure all of the new data input:
-		#NEW DATA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		#NEW DATA
 		data = ser.readline()
-		#data in the form of:speed,rpm,temp_1,temp_2,driving_mode
+		#data in the form of:rpm, speed,temp_1,temp_2
 		[x.strip() for x in data.split(',')] #split by comma
-		self.speed = data[0] #for speedometer mph
-		self.rpm = data[1] #for rpm dial
+		self.rpm = data[0] #for rpm dial
+		self.speed = data[1] #for speedometer mph
 		self.temp_1 = data[2] #temp for engine
 		self.temp_2 = data[3] #temp for engine perimeter
-		self.driving_mode = data[4] #0 = forward, 1 = neutral, 2 = reverse
+
 		#add data to the labels:
 		self.temperature_1.config(text='{0:.2f}'.format(self.temp_1))
 		self.temperature_2.config(text='{0:.2f}'.format(self.temp_2))
@@ -500,7 +593,11 @@ class StevensBajaSAE(tk.Frame):
 		lcd_1.message(self.lcd_1_data)
 		#lcd_2.message(self.lcd_2_data)
 		
-                
+		#add data to database:
+		self.current_datapoint += 1
+		datapoint = RealTimeData.create(rpm = self.rpm, speed = self.speed, fuel_level = self.fuel_level, temp_1 = self.temperature_1, temp_2 = self.temperature_2, lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time, current_lap_time = self.current_lap, total_time = self.total_time, lap_count = self.lap_count, current_time = self.current_time)
+		datapoint.save()
+
 		#refresh data:
 		(self.master).after(self.refresh_time, self.refresh)
 
@@ -641,6 +738,7 @@ def main():
 	root = Canvas(master)
 	root.pack(expand=YES, fill=BOTH)
 	app = StevensBajaSAE(root)
+	root.protocol("WM_DELETE_WINDOW", on_closing)
 	root.mainloop()
 
 if __name__ == "__main__":
