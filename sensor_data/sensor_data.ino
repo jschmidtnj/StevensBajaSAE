@@ -83,7 +83,8 @@ void loop() {
     thermocouple_2_data = thermocouple_2_reading;
   }
   */
-  speed_data = 60.55
+  speed_data = 60.55;
+  thermocouple_2_data = 47.55;
   Serial.println(String(rpm_data, num_decimal) + "," + String(speed_data, num_decimal) + "," + thermocouple_1_data + "," + thermocouple_2_data);
   //+ "," + String(thermocouple_2.readFahrenheit())
   delay(delay_time);

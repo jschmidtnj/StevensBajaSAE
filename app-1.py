@@ -514,14 +514,16 @@ class StevensBajaSAE(tk.Frame):
 		#print(input_data)
 		#configure all of the new data input:
 		#NEW DATA
-		data = ser.readline()
+		self.driving_mode = 0
+		data = str(ser.readline())
 		#data in the form of:rpm, speed,temp_1,temp_2
 		
-		[x for x in data.split(',')] #split by comma
-		self.rpm = data[0] #for rpm dial
-		self.speed = data[1] #for speedometer mph
-		self.temp_1 = data[2] #temp for engine
-		self.temp_2 = data[3] #temp for engine perimeter
+		data_parsed = [x for x in data.split(',')] #split by comma
+		print(data_parsed)
+		self.rpm = float(data_parsed[0][2:]) #for rpm dial
+		self.speed = float(data_parsed[1]) #for speedometer mph
+		self.temp_1 = float(data_parsed[2]) #temp for engine
+		self.temp_2 = float(data_parsed[3][:4]) #temp for engine perimeter
 
 		#add data to the labels:
 		self.temperature_1.config(text='{0:.2f}'.format(self.temp_1))
@@ -595,7 +597,6 @@ class StevensBajaSAE(tk.Frame):
 		#lcd_2.message(self.lcd_2_data)
 		
 		#add data to database:
-		self.current_datapoint += 1
 		datapoint = RealTimeData.create(rpm = self.rpm, speed = self.speed, fuel_level = self.fuel_level, temp_1 = self.temperature_1, temp_2 = self.temperature_2, lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time, current_lap_time = self.current_lap, total_time = self.total_time, lap_count = self.lap_count, current_time = self.current_time)
 		datapoint.save()
 
@@ -739,7 +740,7 @@ def main():
 	root = Canvas(master)
 	root.pack(expand=YES, fill=BOTH)
 	app = StevensBajaSAE(root)
-	root.protocol("WM_DELETE_WINDOW", on_closing)
+	master.protocol("WM_DELETE_WINDOW", app.on_closing)
 	root.mainloop()
 
 if __name__ == "__main__":
