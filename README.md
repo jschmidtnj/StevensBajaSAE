@@ -54,3 +54,4 @@ git submodule init
 git submodule update
 https://www.quinapalus.com/hd44780udg.html
 https://stackoverflow.com/questions/372885/how-do-i-connect-to-a-mysql-database-in-python
+pip install PyMySQL
