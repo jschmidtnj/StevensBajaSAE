@@ -46,7 +46,7 @@ class PreviousLapSummary(Model):
 	average_temp_2 = CharField()
 
 	class Meta:
-        database = db
+            database = db
 
 class RaceSummary(Model):
 	lap_count = CharField()
@@ -57,7 +57,7 @@ class RaceSummary(Model):
 	average_temp_2 = CharField()
 
 	class Meta:
-		database = db
+	    database = db
 
 db.create_tables([RealTimeData, PreviousLapSummary, RaceSummary])
 
@@ -105,7 +105,7 @@ lcd_2_rows    = 2
 #lcd_2 = LCD.Adafruit_CharLCD(lcd_2_rs, lcd_2_en, lcd_2_d4, lcd_2_d5, lcd_2_d6, lcd_2_d7, lcd_2_columns, lcd_2_rows, lcd_2_backlight)
 
 
-port = "/dev/USB0" #ttyS0 on other
+port = "/dev/ttyUSB0" #ttyS0 on other
 rate = 115200
 ser = serial.Serial(port, rate)
 ser.flushInput()
@@ -146,7 +146,7 @@ class StevensBajaSAE(tk.Frame):
 			race_summary_entry = RaceSummary.create(average_rpm = average_rpm_data, average_speed = average_speed_data, total_time = self.total_time, lap_count = lap_count, average_temp_1 = average_temp_1_data, average_temp_2 = average_temp_2_data)
 			race_summary_entry.save()
 			#close window
-        	root.destroy()
+			root.destroy()
 
 	def build_driving_mode_indicator(self, driving_mode):
                 #styling:
@@ -271,8 +271,8 @@ class StevensBajaSAE(tk.Frame):
 		if fuel_level < out_of_fuel_threshold:
 			(self.master).create_text((x0_background_guage + (width_of_fuelguage / 2)), (y0_background_guage + (height_of_fuelguage / 2)), text=out_of_fuel_label, font=out_of_fuel_font)
 		else:
-            #create current level label
-            (self.master).create_text((x1_indicator_guage + current_fuel_level_x_offset), (y0_background_guage + (height_of_fuelguage / 2)), text=("{0:.02f}%".format(fuel_level)), font=current_fuel_level_indicator_font)
+                    #create current level label
+                    (self.master).create_text((x1_indicator_guage + current_fuel_level_x_offset), (y0_background_guage + (height_of_fuelguage / 2)), text=("{0:.02f}%".format(fuel_level)), font=current_fuel_level_indicator_font)
 
 
 	def create_tickmarks_and_labels(self, min_value, max_value, dial_spacing, x0_dial, y0_dial, dial_radius, offset_ticks, offset_text, num_labels, text_label_font):
@@ -451,19 +451,19 @@ class StevensBajaSAE(tk.Frame):
 		self.fuel_level = 100
 
 	def reset_gui(self, master):
-        #reset the lap info
-        self.added_fuel(master)
-        self.first_new_lap_click = True
-        self.new_lap_button.config(text="Start")
-        self.total_time.config(text="n/a")
-        self.lap_time.config(text="n/a")
-        self.current_lap = 0
-        self.sum_previous_laps = 0
-        #send this data to mysql db
-        self.previous_laps = []
+            #reset the lap info
+            self.added_fuel(master)
+            self.first_new_lap_click = True
+            self.new_lap_button.config(text="Start")
+            self.total_time.config(text="n/a")
+            self.lap_time.config(text="n/a")
+            self.current_lap = 0
+            self.sum_previous_laps = 0
+            #send this data to mysql db
+            self.previous_laps = []
     
 	def mode_toggle(self, master):
-        return false
+            return false
         
 	def new_lap(self, master):
 		if self.first_new_lap_click == True:
@@ -516,7 +516,8 @@ class StevensBajaSAE(tk.Frame):
 		#NEW DATA
 		data = ser.readline()
 		#data in the form of:rpm, speed,temp_1,temp_2
-		[x.strip() for x in data.split(',')] #split by comma
+		
+		[x for x in data.split(',')] #split by comma
 		self.rpm = data[0] #for rpm dial
 		self.speed = data[1] #for speedometer mph
 		self.temp_1 = data[2] #temp for engine
