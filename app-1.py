@@ -652,7 +652,12 @@ class StevensBajaSAE(tk.Frame):
 		self.button_1_state = False #false = off
 		#self.button_2_state = False #false = off
 
-		#vars for widgets:
+		#global vars for functions:
+		self.database_delay = 2 #seconds between each data-poiint
+		self.rpm_array = []
+		self.speed_array = []
+		self.temp_1_array = []
+		self.temp_2_array = []
 		self.fuel_tank_size = 10 #gallons
 		self.refresh_time = 10 #ms
 		self.lap_distance_data = 0
