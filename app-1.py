@@ -610,8 +610,10 @@ class StevensBajaSAE(tk.Frame):
 		self.temp_1_array.append(self.temp_1)
 		self.temp_2_array.append(self.temp_2)
 		
-		if self.database_time > (self.database_delay * 1000):
+		if (self.current_time - self.database_time) > (self.database_delay * 1000):
+                    self.database_time = time.time()
                     #add data to database:
+                    #PROBLEM WITH PASSING LABELS IN FOR DATA
                     datapoint = RealTimeData.create(rpm = (sum(self.rpm_array) / float(len(self.rpm_array))), speed = (sum(self.speed_array) / float(len(self.speed_array))), fuel_level = self.fuel_level, temp_1 = (sum(self.temp_1_array) / float(len(self.temp_1_array))), temp_2 = (sum(self.temp_2_array) / float(len(self.temp_2_array))), lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time, current_lap_time = self.current_lap, total_time = self.total_time, lap_count = self.lap_count, current_time = self.current_time)
                     datapoint.save()
 
@@ -675,7 +677,7 @@ class StevensBajaSAE(tk.Frame):
 		self.current_lap = 0
 		self.sum_previous_laps = 0
 		self.first_new_lap_click = True
-		self.last_fueling_time = self.database_time = time.time()
+		self.last_fueling_time = self.database_time = self.current_time_data = time.time()
 		self.fuel_level_starting_percentage = 100
 		self.fuel_level = self.fuel_level_starting_percentage
 
