@@ -604,9 +604,16 @@ class StevensBajaSAE(tk.Frame):
 		lcd_1.message(self.lcd_1_data)
 		#lcd_2.message(self.lcd_2_data)
 		
-		#add data to database:
-		datapoint = RealTimeData.create(rpm = self.rpm, speed = self.speed, fuel_level = self.fuel_level, temp_1 = self.temperature_1, temp_2 = self.temperature_2, lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time, current_lap_time = self.current_lap, total_time = self.total_time, lap_count = self.lap_count, current_time = self.current_time)
-		datapoint.save()
+		#add data to rolling array:
+		self.rpm_array.append(self.rpm)
+		self.speed_array.append(self.speed)
+		self.temp_1_array.append(self.temperature_1)
+		self.temp_2_array.append(self.temperature_2)
+		
+		if self.database_time > (self.database_delay * 1000):
+                    #add data to database:
+                    datapoint = RealTimeData.create(rpm = self.rpm, speed = self.speed, fuel_level = self.fuel_level, temp_1 = self.temperature_1, temp_2 = self.temperature_2, lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time, current_lap_time = self.current_lap, total_time = self.total_time, lap_count = self.lap_count, current_time = self.current_time)
+                    datapoint.save()
 
 		#refresh data:
 		(self.master).after(self.refresh_time, self.refresh)
@@ -653,13 +660,13 @@ class StevensBajaSAE(tk.Frame):
 		#self.button_2_state = False #false = off
 
 		#global vars for functions:
+		self.refresh_time = 10 #ms
 		self.database_delay = 2 #seconds between each data-poiint
 		self.rpm_array = []
 		self.speed_array = []
 		self.temp_1_array = []
 		self.temp_2_array = []
 		self.fuel_tank_size = 10 #gallons
-		self.refresh_time = 10 #ms
 		self.lap_distance_data = 0
 		self.total_distance_data = 0
 		self.current_gear = "P"
@@ -668,7 +675,7 @@ class StevensBajaSAE(tk.Frame):
 		self.current_lap = 0
 		self.sum_previous_laps = 0
 		self.first_new_lap_click = True
-		self.last_fueling_time = time.time()
+		self.last_fueling_time = self.database_time = time.time()
 		self.fuel_level_starting_percentage = 100
 		self.fuel_level = self.fuel_level_starting_percentage
 
