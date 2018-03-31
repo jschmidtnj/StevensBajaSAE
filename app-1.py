@@ -607,12 +607,12 @@ class StevensBajaSAE(tk.Frame):
 		#add data to rolling array:
 		self.rpm_array.append(self.rpm)
 		self.speed_array.append(self.speed)
-		self.temp_1_array.append(self.temperature_1)
-		self.temp_2_array.append(self.temperature_2)
+		self.temp_1_array.append(self.temp_1)
+		self.temp_2_array.append(self.temp_2)
 		
 		if self.database_time > (self.database_delay * 1000):
                     #add data to database:
-                    datapoint = RealTimeData.create(rpm = self.rpm, speed = self.speed, fuel_level = self.fuel_level, temp_1 = self.temperature_1, temp_2 = self.temperature_2, lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time, current_lap_time = self.current_lap, total_time = self.total_time, lap_count = self.lap_count, current_time = self.current_time)
+                    datapoint = RealTimeData.create(rpm = (sum(self.rpm_array) / float(len(self.rpm_array))), speed = (sum(self.speed_array) / float(len(self.speed_array))), fuel_level = self.fuel_level, temp_1 = (sum(self.temp_1_array) / float(len(self.temp_1_array))), temp_2 = (sum(self.temp_2_array) / float(len(self.temp_2_array))), lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time, current_lap_time = self.current_lap, total_time = self.total_time, lap_count = self.lap_count, current_time = self.current_time)
                     datapoint.save()
 
 		#refresh data:
