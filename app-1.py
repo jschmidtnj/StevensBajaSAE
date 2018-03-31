@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 import tkinter as tk
 from tkinter import *
+from tkinter import messagebox
 from tkinter.font import Font
 from Adafruit_LED_Backpack import SevenSegment
 import Adafruit_CharLCD as LCD
@@ -139,14 +140,16 @@ class StevensBajaSAE(tk.Frame):
 				average_temp_1_data += datapoint.temp_1
 				average_temp_2_data += datapoint.temp_2
 				count += 1
-			average_rpm_data /= count
-			average_speed_data /= count
-			average_temp_1_data /= count
-			average_temp_2_data /= count
-			race_summary_entry = RaceSummary.create(average_rpm = average_rpm_data, average_speed = average_speed_data, total_time = self.total_time, lap_count = lap_count, average_temp_1 = average_temp_1_data, average_temp_2 = average_temp_2_data)
-			race_summary_entry.save()
+			if count != 0:
+                            average_rpm_data /= count
+                            average_speed_data /= count
+                            average_temp_1_data /= count
+                            average_temp_2_data /= count
+                            race_summary_entry = RaceSummary.create(average_rpm = average_rpm_data, average_speed = average_speed_data, total_time = self.total_time, lap_count = lap_count, average_temp_1 = average_temp_1_data, average_temp_2 = average_temp_2_data)
+                            race_summary_entry.save()
 			#close window
-			root.destroy()
+			(self.master).destroy()
+			exit()
 
 	def build_driving_mode_indicator(self, driving_mode):
                 #styling:
@@ -483,12 +486,13 @@ class StevensBajaSAE(tk.Frame):
 			average_temp_1_data += datapoint.temp_1
 			average_temp_2_data += datapoint.temp_2
 			count += 1
-		average_rpm_data /= count
-		average_speed_data /= count
-		average_temp_1_data /= count
-		average_temp_2_data /= count
-		previous_lap_entry = PreviousLapSummary.create(previous_lap_time = self.current_lap, average_rpm = average_rpm_data, average_speed = average_speed_data, total_time = self.total_time, lap_count = lap_count, current_time = self.current_time, average_temp_1 = average_temp_1_data, average_temp_2 = average_temp_2_data)
-		previous_lap_entry.save()
+		if count != 0:
+                    average_rpm_data /= count
+                    average_speed_data /= count
+                    average_temp_1_data /= count
+                    average_temp_2_data /= count
+                    previous_lap_entry = PreviousLapSummary.create(previous_lap_time = self.current_lap, average_rpm = average_rpm_data, average_speed = average_speed_data, total_time = self.total_time, lap_count = lap_count, current_time = self.current_time, average_temp_1 = average_temp_1_data, average_temp_2 = average_temp_2_data)
+                    previous_lap_entry.save()
 		self.previous_laps.append(self.current_lap)
 		self.lap_distance_data = 0
 		self.current_lap = 0
@@ -519,7 +523,6 @@ class StevensBajaSAE(tk.Frame):
 		#data in the form of:rpm, speed,temp_1,temp_2
 		
 		data_parsed = [x for x in data.split(',')] #split by comma
-		print(data_parsed)
 		self.rpm = float(data_parsed[0][2:]) #for rpm dial
 		self.speed = float(data_parsed[1]) #for speedometer mph
 		self.temp_1 = float(data_parsed[2]) #temp for engine
@@ -535,7 +538,7 @@ class StevensBajaSAE(tk.Frame):
 		self.seven_segment_display_3_data = 14.222
 		#adjust the fuel level:
 		#if start was hit
-		if self.previous_laps != []:
+		if self.previous_laps != [] and self.rpm != 0:
 			#ln function of rpm requires three constants that need to be solved for somehow
 			self.fuel_level = self.fuel_level - ((.2*math.log(self.rpm) + .05) * self.refresh_time / (self.fuel_tank_size * 40))
 			distance_data = float((self.speed / 3600000 * self.refresh_time * 8.65)) #delay for program time use (ms)

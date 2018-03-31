@@ -24,13 +24,13 @@ unsigned int thermoDO_1 = 4;
 unsigned int thermoCS_1 = 5;
 unsigned int thermoCLK_1 = 6;
 MAX6675 thermocouple_1(thermoCLK_1, thermoCS_1, thermoDO_1);
-String thermocouple_1_data = "-";
+String thermocouple_1_data = "0";
 
 unsigned int thermoDO_2 = 7;
 unsigned int thermoCS_2 = 8;
 unsigned int thermoCLK_2 = 9;
 MAX6675 thermocouple_2(thermoCLK_2, thermoCS_2, thermoDO_2);
-String thermocouple_2_data = "-";
+String thermocouple_2_data = "0";
 
 void setup() {
   // put your setup code here, to run once:
@@ -83,9 +83,10 @@ void loop() {
     thermocouple_2_data = thermocouple_2_reading;
   }
   */
+  rpm_data = 700;
   speed_data = 60.55;
   thermocouple_2_data = 47.55;
-  Serial.println(String(rpm_data, num_decimal) + "," + String(speed_data, num_decimal) + "," + thermocouple_1_data + "," + thermocouple_2_data);
+  Serial.println(String(rpm_data, num_decimal) + "," + String(speed_data, num_decimal) + "," + thermocouple_1_data + "," + thermocouple_2_data + ",");
   //+ "," + String(thermocouple_2.readFahrenheit())
   delay(delay_time);
 }
