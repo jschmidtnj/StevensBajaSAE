@@ -1,4 +1,6 @@
 import serial
+import os
+ import envoy
 import math
 import sys
 import time
@@ -149,6 +151,9 @@ class StevensBajaSAE(tk.Frame):
                             race_summary_entry.save()
 			#close window
 			(self.master).destroy()
+			#run the mysql script to csv
+			my_path = os.path.dirname(os.path.abspath(__file__))
+			envoy.run('./scripts.sh', cwd=my_path)
 			exit()
 
 	def build_driving_mode_indicator(self, driving_mode):
