@@ -438,12 +438,16 @@ class StevensBajaSAE(tk.Frame):
 	def time_info(self):
 		#if there are previous laps:
 		if self.previous_laps != []:
-			current_time = time.time() - self.initial_time
+			self.current_time_data = time.time() - self.initial_time
 			self.current_lap = current_time - self.sum_previous_laps
-			self.previous_lap_time.config(text='{0:.3f}'.format(self.previous_laps[len(self.previous_laps) - 1]))
+			self.previous_lap_time_data = '{0:.3f}'.format(self.previous_laps[len(self.previous_laps) - 1])
+			self.previous_lap_time.config(text=self.previous_lap_time_data)
 			#there are previous laps
-			self.total_time.config(text='{0:.3f}'.format(current_time))
-			self.lap_time.config(text='{0:.3f}'.format(self.current_lap))
+			
+			
+		self.total_time_data = '{0:.3f}'.format(current_time)	self.total_time.config(text=self.total_time_data)
+			
+		self.lap_time_data = '{0:.3f}'.format(self.current_lap)	self.lap_time.config(text=self.lap_time_data)
 		#if there are no previous laps:
 		else:
 			self.previous_lap_time.config(text='n/a')
@@ -451,8 +455,11 @@ class StevensBajaSAE(tk.Frame):
 		the_time_and_date = str(datetime.now())
 		the_time = the_time_and_date[11:]
 		the_date = the_time_and_date[:10]
-		self.current_time.config(text='{0}'.format(the_time[:11]))
+		
+	self.current_time_data = '{0}'.format(the_time[:11])	self.current_time.config(text=self.current_time_data)
+		
 		current_lap_count = len(self.previous_laps)
+		self.lap_count_data = current_lap_count
 		self.lap_count.config(text='Lap {0:.0f}'.format(current_lap_count))
 
 	def added_fuel(self, master):
