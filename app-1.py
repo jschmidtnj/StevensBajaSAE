@@ -153,7 +153,7 @@ class StevensBajaSAE(tk.Frame):
 			(self.master).destroy()
 			#run the mysql script to csv
 			my_path = os.path.dirname(os.path.abspath(__file__))
-			envoy.run('./scripts.sh', cwd=my_path)
+			envoy.run('./end-script.sh', cwd=my_path)
 			exit()
 
 	def build_driving_mode_indicator(self, driving_mode):
