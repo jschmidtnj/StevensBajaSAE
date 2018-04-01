@@ -436,9 +436,9 @@ class StevensBajaSAE(tk.Frame):
 		self.create_tickmarks_and_labels(min_value_rpm, max_value_rpm, dial_spacing, x0_dial2, y0_dial2, dial_radius, offset_ticks, offset_text, num_labels, text_label_font)
 
 	def time_info(self):
+		self.current_time_int = time.time() - self.initial_time
 		#if there are previous laps:
 		if self.previous_laps != []:
-			self.current_time_int = time.time() - self.initial_time
 			self.current_lap = self.current_time_int - self.sum_previous_laps
 			self.previous_lap_time_data = '{0:.3f}'.format(self.previous_laps[len(self.previous_laps) - 1])
 			self.previous_lap_time.config(text=self.previous_lap_time_data)
@@ -614,8 +614,8 @@ class StevensBajaSAE(tk.Frame):
 		self.temp_1_array.append(self.temp_1)
 		self.temp_2_array.append(self.temp_2)
 		print(self.current_time_int - self.database_time)
-		if (self.current_time_data- self.database_time) > (self.database_delay):
-                    self.database_time = self.current_time_data
+		if (self.current_time_int- self.database_time) > (self.database_delay):
+                    self.database_time = self.current_time_int
                     #add data to database:
                     #PROBLEM WITH PASSING LABELS IN FOR DATA
                     datapoint = RealTimeData.create(rpm = (sum(self.rpm_array) / float(len(self.rpm_array))), speed = (sum(self.speed_array) / float(len(self.speed_array))), fuel_level = self.fuel_level, temp_1 = (sum(self.temp_1_array) / float(len(self.temp_1_array))), temp_2 = (sum(self.temp_2_array) / float(len(self.temp_2_array))), lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time_data, current_lap_time = self.current_lap_time_data, total_time = self.total_time_data, lap_count = self.lap_count_data, current_time = self.current_time_data)
@@ -685,7 +685,7 @@ class StevensBajaSAE(tk.Frame):
 		self.current_lap = 0
 		self.sum_previous_laps = 0
 		self.first_new_lap_click = True
-		self.last_fueling_time = self.database_time = self.current_time_int = time.time()
+		self.last_fueling_time = self.database_time = self.current_time_int = self.initial_time = time.time()
 		self.fuel_level_starting_percentage = 100
 		self.fuel_level = self.fuel_level_starting_percentage
 
