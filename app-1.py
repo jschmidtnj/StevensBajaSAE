@@ -438,12 +438,15 @@ class StevensBajaSAE(tk.Frame):
 	def time_info(self):
 		#if there are previous laps:
 		if self.previous_laps != []:
-			current_time = time.time() - self.initial_time
-			self.current_lap = current_time - self.sum_previous_laps
-			self.previous_lap_time.config(text='{0:.3f}'.format(self.previous_laps[len(self.previous_laps) - 1]))
+			self.current_time_int = time.time() - self.initial_time
+			self.current_lap = self.current_time_int - self.sum_previous_laps
+			self.previous_lap_time_data = '{0:.3f}'.format(self.previous_laps[len(self.previous_laps) - 1])
+			self.previous_lap_time.config(text=self.previous_lap_time_data)
 			#there are previous laps
-			self.total_time.config(text='{0:.3f}'.format(current_time))
-			self.lap_time.config(text='{0:.3f}'.format(self.current_lap))
+			self.total_time_data = '{0:.3f}'.format(self.current_time_int)
+			self.total_time.config(text=self.total_time_data)
+			self.current_lap_time_data = '{0:.3f}'.format(self.current_lap)
+			self.lap_time.config(text=self.current_lap_time_data)
 		#if there are no previous laps:
 		else:
 			self.previous_lap_time.config(text='n/a')
@@ -451,9 +454,10 @@ class StevensBajaSAE(tk.Frame):
 		the_time_and_date = str(datetime.now())
 		the_time = the_time_and_date[11:]
 		the_date = the_time_and_date[:10]
-		self.current_time.config(text='{0}'.format(the_time[:11]))
-		current_lap_count = len(self.previous_laps)
-		self.lap_count.config(text='Lap {0:.0f}'.format(current_lap_count))
+		self.current_time_data = '{0}'.format(the_time[:11])
+		self.current_time.config(text=self.current_time_data)
+		self.lap_count_data = len(self.previous_laps)
+		self.lap_count.config(text='Lap {0:.0f}'.format(self.lap_count_data))
 
 	def added_fuel(self, master):
 		self.fuel_level = 100
@@ -610,11 +614,11 @@ class StevensBajaSAE(tk.Frame):
 		self.temp_1_array.append(self.temp_1)
 		self.temp_2_array.append(self.temp_2)
 		
-		if (self.current_time - self.database_time) > (self.database_delay * 1000):
+		if (self.current_time_int- self.database_time) > (self.database_delay * 1000):
                     self.database_time = time.time()
                     #add data to database:
                     #PROBLEM WITH PASSING LABELS IN FOR DATA
-                    datapoint = RealTimeData.create(rpm = (sum(self.rpm_array) / float(len(self.rpm_array))), speed = (sum(self.speed_array) / float(len(self.speed_array))), fuel_level = self.fuel_level, temp_1 = (sum(self.temp_1_array) / float(len(self.temp_1_array))), temp_2 = (sum(self.temp_2_array) / float(len(self.temp_2_array))), lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time, current_lap_time = self.current_lap, total_time = self.total_time, lap_count = self.lap_count, current_time = self.current_time)
+                    datapoint = RealTimeData.create(rpm = (sum(self.rpm_array) / float(len(self.rpm_array))), speed = (sum(self.speed_array) / float(len(self.speed_array))), fuel_level = self.fuel_level, temp_1 = (sum(self.temp_1_array) / float(len(self.temp_1_array))), temp_2 = (sum(self.temp_2_array) / float(len(self.temp_2_array))), lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time_data, current_lap_time = self.current_lap_time_data, total_time = self.total_time_data, lap_count = self.lap_count_data, current_time = self.current_time_data)
                     datapoint.save()
 
 		#refresh data:
@@ -664,6 +668,11 @@ class StevensBajaSAE(tk.Frame):
 		#global vars for functions:
 		self.refresh_time = 10 #ms
 		self.database_delay = 2 #seconds between each data-poiint
+		self.previous_lap_time_data = ""
+		self.current_lap_time_data = ""
+		self.total_time_data = ""
+		self.current_time_data = ""
+		self.current_time_int = 0
 		self.rpm_array = []
 		self.speed_array = []
 		self.temp_1_array = []
@@ -672,7 +681,7 @@ class StevensBajaSAE(tk.Frame):
 		self.lap_distance_data = 0
 		self.total_distance_data = 0
 		self.current_gear = "P"
-		self.lap_count = 0
+		self.lap_count_data = 0
 		self.previous_laps = list()
 		self.current_lap = 0
 		self.sum_previous_laps = 0
