@@ -613,10 +613,9 @@ class StevensBajaSAE(tk.Frame):
 		self.speed_array.append(self.speed)
 		self.temp_1_array.append(self.temp_1)
 		self.temp_2_array.append(self.temp_2)
-		
-		if (self.current_time_int- self.database_time) > (self.database_delay):
-                    print(self.current_time_int - self.database_time)
-                    self.database_time = self.current_time_int
+		print(self.current_time_int - self.database_time)
+		if (self.current_time_data- self.database_time) > (self.database_delay):
+                    self.database_time = self.current_time_data
                     #add data to database:
                     #PROBLEM WITH PASSING LABELS IN FOR DATA
                     datapoint = RealTimeData.create(rpm = (sum(self.rpm_array) / float(len(self.rpm_array))), speed = (sum(self.speed_array) / float(len(self.speed_array))), fuel_level = self.fuel_level, temp_1 = (sum(self.temp_1_array) / float(len(self.temp_1_array))), temp_2 = (sum(self.temp_2_array) / float(len(self.temp_2_array))), lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time_data, current_lap_time = self.current_lap_time_data, total_time = self.total_time_data, lap_count = self.lap_count_data, current_time = self.current_time_data)
@@ -673,7 +672,6 @@ class StevensBajaSAE(tk.Frame):
 		self.current_lap_time_data = ""
 		self.total_time_data = ""
 		self.current_time_data = ""
-		self.current_time_int = 0
 		self.rpm_array = []
 		self.speed_array = []
 		self.temp_1_array = []
@@ -687,7 +685,7 @@ class StevensBajaSAE(tk.Frame):
 		self.current_lap = 0
 		self.sum_previous_laps = 0
 		self.first_new_lap_click = True
-		self.last_fueling_time = self.database_time = self.current_time_data = time.time()
+		self.last_fueling_time = self.database_time = self.current_time_int = time.time()
 		self.fuel_level_starting_percentage = 100
 		self.fuel_level = self.fuel_level_starting_percentage
 
