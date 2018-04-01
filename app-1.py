@@ -614,7 +614,8 @@ class StevensBajaSAE(tk.Frame):
 		self.temp_1_array.append(self.temp_1)
 		self.temp_2_array.append(self.temp_2)
 		
-		if (self.current_time_int- self.database_time) > (self.database_delay * 1000):
+		if (self.current_time_int- self.database_time) > (self.database_delay):
+                    print(self.current_time_int - self.database_time)
                     self.database_time = self.current_time_int
                     #add data to database:
                     #PROBLEM WITH PASSING LABELS IN FOR DATA
