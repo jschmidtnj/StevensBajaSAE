@@ -686,7 +686,7 @@ class StevensBajaSAE(tk.Frame):
 		self.sum_previous_laps = 0
 		self.first_new_lap_click = True
 		self.last_fueling_time = self.current_time_int = self.initial_time = time.time()
-		self.database_time = self.initial_time
+		self.database_time = 0
 		self.fuel_level_starting_percentage = 100
 		self.fuel_level = self.fuel_level_starting_percentage
 
