@@ -613,7 +613,7 @@ class StevensBajaSAE(tk.Frame):
 		self.speed_array.append(self.speed)
 		self.temp_1_array.append(self.temp_1)
 		self.temp_2_array.append(self.temp_2)
-		print(self.current_time_int - self.database_time)
+		
 		if (self.current_time_int- self.database_time) > (self.database_delay):
                     self.database_time = self.current_time_int
                     #add data to database:
@@ -627,6 +627,11 @@ class StevensBajaSAE(tk.Frame):
 	def __init__(self, master):
 		#initialize the app - the size, title, etc.
 		self.master = master
+		
+		#clear the mysql tables and run bash script
+		#run the mysql script to csv
+		my_path = os.path.dirname(os.path.abspath(__file__))
+		envoy.run('./start-script.sh', cwd=my_path)
 
 		#Styling
 		#Header
