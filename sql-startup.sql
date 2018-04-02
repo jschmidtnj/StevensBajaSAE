@@ -1,3 +1,5 @@
 use StevensBajaSAEData;
-TRUNCATE realtimedata, previouslapsummary, racesummary;
+TRUNCATE realtimedata;
+TRUNCATE previouslapsummary;
+TRUNCATE racesummary;
 exit
