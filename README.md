@@ -1,5 +1,8 @@
 # Stevens Baja SAE Dashboard 2018
 
+##Pictures!
+
+
 ## Overview
 
 This year the Stevens Baja SAE team decided to do something different with the analog and digital data streams in the car. Instead of relying on off-the-shelf gagues, tachometers and data collection technologies, the team decided to build a custom system from the ground up, incorporating open-source technologies to make the system completely customizable. At its core, the dash systems consists of a Raspberry Pi and Arduino Nano microcontroller, with sensors to gather data throughout the car. The data is then transmitted to a remote database, where it is analyzed and produces graphed results.
