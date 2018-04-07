@@ -1,5 +1,6 @@
 #!/bin/sh
 
+#use git config remote.origin.url https://jschmidtnj:PASSWORD@github.com/jschmidtnj/StevensBajaSAE.git if there are login errors
 sudo mysql -u "root" < sql-to-csv.sql
 cd /tmp
 sudo chmod -R 777 /tmp
