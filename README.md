@@ -1,7 +1,7 @@
 # Stevens Baja SAE Dashboard 2018
 
 ##Pictures!
-
+![Alt text] (https://photos.app.goo.gl/HGCkbyy5vwmoIjK72 "The Arduino")
 
 ## Overview
 
