@@ -1,6 +1,8 @@
 # Stevens Baja SAE Dashboard 2018
 
-## Pictures! https://photos.app.goo.gl/HGCkbyy5vwmoIjK72
+## Pictures!
+
+https://photos.app.goo.gl/HGCkbyy5vwmoIjK72
 https://photos.app.goo.gl/KcdQ2tFwAedsjuV73
 https://photos.app.goo.gl/i86ov0To1MeFdaD83
 https://photos.app.goo.gl/X3DWIOfzeDA88sxq1
