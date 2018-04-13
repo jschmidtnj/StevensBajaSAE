@@ -478,7 +478,7 @@ class StevensBajaSAE(tk.Frame):
             self.previous_laps = []
     
 	def mode_toggle(self, master):
-            return false
+            return
         
 	def new_lap(self, master):
 		if self.first_new_lap_click == True:
