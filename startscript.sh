@@ -10,3 +10,5 @@ git add -A
 git commit -m "added data files"
 git push origin master
 python3 /home/pi/Desktop/StevensBajaSAE/app-1.py
+^c^c^c
+python3 /home/pi/Desktop/StevensBajaSAE/app-1.py
