@@ -121,9 +121,9 @@ ser.flushInput()
 seven_segment_display_1 = SevenSegment.SevenSegment(address=0x70)
 seven_segment_display_1.begin()
 #3 seven segment displays
-'''
-seven_segment_display_2 = SevenSegment.SevenSegment(address=0x60)
+seven_segment_display_2 = SevenSegment.SevenSegment(address=0x72)
 seven_segment_display_2.begin()
+'''
 seven_segment_display_3 = SevenSegment.SevenSegment(address=0x50)
 seven_segment_display_3.begin()
 '''
@@ -597,16 +597,17 @@ class StevensBajaSAE(tk.Frame):
 		
 		#send data to seven segment displays
 		seven_segment_display_1.clear()
-		'''
 		seven_segment_display_2.clear()
+		'''
 		seven_segment_display_3.clear()
 		'''
 		seven_segment_display_1.print_float(self.seven_segment_display_1_data, decimal_digits=0)
+		seven_segment_display_2.print_float(self.seven_segment_display_2_data, decimal_digits=1)
 		'''
-		seven_segment_display_2.print_float(self.seven_segment_display_2_data, decimal_digits=2)
 		seven_segment_display_3.print_float(self.seven_segment_display_3_data, decimal_digits=2)
 		'''
 		seven_segment_display_1.write_display()
+		seven_segment_display_2.write_display()
 		
 		#send data to the LCDs
 		lcd_1.set_cursor(0,0)
