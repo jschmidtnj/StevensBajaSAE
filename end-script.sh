@@ -2,9 +2,9 @@
 
 #use git config remote.origin.url https://jschmidtnj:PASSWORD@github.com/jschmidtnj/StevensBajaSAE.git if there are login errors
 sudo mysql -u "root" < sql-to-csv.sql
-cd /tmp
 sudo chmod -R 777 /tmp
 sudo chmod -R 777 /mnt
+cd /tmp
 file_name=data.csv
 current_time=$(date +"%Y-%m-%d-%H-%M-%S")
 new_filename=$current_time-$file_name
