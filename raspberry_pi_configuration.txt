@@ -20,3 +20,9 @@ python3 /home/pi/Desktop/StevensBajaSAE/app-1.py
 sudo chmod 777 /home/pi/Desktop/fliptouch.sh
 sudo nano ~/.config/lxsession/LXDE-pi/autostart
 @/home/pi/Desktop/StevensBajaSAE/startscript.sh
+
+xinput --set-prop 'FT5406 memory based driver' 'Coordinate Transformation Matrix' 0 1 0 -1 0 1 0 0 1
+sudo su
+brightness=30
+echo $brightness > /sys/class/backlight/rpi_backlight/brightness
+exit
