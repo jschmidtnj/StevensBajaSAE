@@ -4,6 +4,7 @@
 sudo mysql -u "root" < sql-to-csv.sql
 cd /tmp
 sudo chmod -R 777 /tmp
+sudo chmod -R 777 /mnt
 file_name=data.csv
 current_time=$(date +"%Y-%m-%d-%H-%M-%S")
 new_filename=$current_time-$file_name
