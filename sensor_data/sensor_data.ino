@@ -16,7 +16,7 @@ unsigned int diameter = 1; //in feet
 unsigned int num_decimal = 2;
 unsigned int rpm_pin = 2;
 unsigned int speed_pin = 3;
-unsigned int delay_time = 10; //ms
+unsigned int delay_time = 5; //ms //10
 double rpm_data = 0;
 double speed_data = 0;
 
@@ -36,7 +36,7 @@ void setup() {
   // put your setup code here, to run once:
   pinMode(rpm_pin, INPUT);
   pinMode(speed_pin, INPUT);
-  Serial.begin(115200);
+  Serial.begin(115200); //115200
   previous_time_rpm = micros();
 }
 
@@ -77,16 +77,16 @@ void loop() {
   if (thermocouple_1_reading != " NAN"){
     thermocouple_1_data = thermocouple_1_reading;
   }
-  /*
+  
   String thermocouple_2_reading = String(thermocouple_2.readFahrenheit());
   if (thermocouple_2_reading != " NAN"){
     thermocouple_2_data = thermocouple_2_reading;
   }
-  */
-  rpm_data = 700;
-  speed_data = 60.55;
-  thermocouple_2_data = 47.55;
-  Serial.println(String(rpm_data, num_decimal) + "," + String(speed_data, num_decimal) + "," + thermocouple_1_data + "," + thermocouple_2_data + ",");
-  //+ "," + String(thermocouple_2.readFahrenheit())
+  
+  //rpm_data = 700;
+  //speed_data = 60.55;
+  //thermocouple_2_data = 47.55;
+  Serial.println(digitalRead(rpm_pin), digitalRead(speed_pin));
+  //Serial.println(String(rpm_data, num_decimal) + "," + String(speed_data, num_decimal) + "," + thermocouple_1_data + "," + thermocouple_2_data + ",");
   delay(delay_time);
 }
