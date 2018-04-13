@@ -11,4 +11,6 @@ git pull origin master
 git add -A
 git commit -m "added data files"
 git push origin master
+sudo mount /dev/sda1 /mnt/usb/
+python3 /home/pi/Desktop/StevensBajaSAE/app-1.py
 python3 /home/pi/Desktop/StevensBajaSAE/app-1.py
