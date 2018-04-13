@@ -177,6 +177,6 @@ void loop() // run over and over again
       speed_gps = String(GPS.speed, 4);
       altitude_gps = String(GPS.altitude);
     }
-    Serial.println(String("asdf") + "," + String(rpm_data, num_decimal) + "," + speed_gps + "," + thermocouple_1_data + "," + thermocouple_2_data + "," + latitude + "," + longitude + "," + altitude_gps + "," );
   }
+  Serial.println(String("asdf") + "," + String(rpm_data, num_decimal) + "," + speed_gps + "," + thermocouple_1_data + "," + thermocouple_2_data + "," + latitude + "," + longitude + "," + altitude_gps + "," );
 }
