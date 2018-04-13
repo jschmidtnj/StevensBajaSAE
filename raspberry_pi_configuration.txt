@@ -28,3 +28,6 @@ sudo su
 brightness=100
 echo $brightness > /sys/class/backlight/rpi_backlight/brightness
 exit
+
+
+git config credential.helper store
