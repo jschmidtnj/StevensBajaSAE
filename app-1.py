@@ -34,6 +34,9 @@ class RealTimeData(Model):
     total_time = CharField()
     lap_count = CharField()
     current_time = CharField()
+    latitude = CharField()
+    longitude = CharField()
+    altitude = CharField()
 
     class Meta:
         database = db
@@ -536,6 +539,9 @@ class StevensBajaSAE(tk.Frame):
 		self.speed = float(data_parsed[1]) #for speedometer mph
 		self.temp_1 = float(data_parsed[2]) #temp for engine
 		self.temp_2 = float(data_parsed[3][:4]) #temp for engine perimeter
+		self.latitude = float(data_parsed[4])
+		self.longitude = float(data_parsed[5])
+		self.altitude = float(data_parsed[6])
 
 		#add data to the labels:
 		self.temperature_1.config(text='{0:.2f}'.format(self.temp_1))
@@ -618,7 +624,7 @@ class StevensBajaSAE(tk.Frame):
                     self.database_time = self.current_time_int
                     #add data to database:
                     #PROBLEM WITH PASSING LABELS IN FOR DATA
-                    datapoint = RealTimeData.create(rpm = (sum(self.rpm_array) / float(len(self.rpm_array))), speed = (sum(self.speed_array) / float(len(self.speed_array))), fuel_level = self.fuel_level, temp_1 = (sum(self.temp_1_array) / float(len(self.temp_1_array))), temp_2 = (sum(self.temp_2_array) / float(len(self.temp_2_array))), lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time_data, current_lap_time = self.current_lap_time_data, total_time = self.total_time_data, lap_count = self.lap_count_data, current_time = self.current_time_data)
+                    datapoint = RealTimeData.create(rpm = (sum(self.rpm_array) / float(len(self.rpm_array))), speed = (sum(self.speed_array) / float(len(self.speed_array))), fuel_level = self.fuel_level, temp_1 = (sum(self.temp_1_array) / float(len(self.temp_1_array))), temp_2 = (sum(self.temp_2_array) / float(len(self.temp_2_array))), lap_distance = self.lap_distance_data, total_distance = self.total_distance_data, driving_mode = self.driving_mode, previous_lap_time = self.previous_lap_time_data, current_lap_time = self.current_lap_time_data, total_time = self.total_time_data, lap_count = self.lap_count_data, current_time = self.current_time_data, latitude = self.latitude, longitude = self.longitude, altitude = self.altitude)
                     datapoint.save()
 
 		#refresh data:
@@ -694,6 +700,9 @@ class StevensBajaSAE(tk.Frame):
 		self.database_time = 0
 		self.fuel_level_starting_percentage = 100
 		self.fuel_level = self.fuel_level_starting_percentage
+		self.latitude = 0
+		self.longitude = 0
+		self.altitude = 0
 
 		#create the widgets:
 		#time widgets
