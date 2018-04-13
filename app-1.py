@@ -121,7 +121,7 @@ ser.flushInput()
 seven_segment_display_1 = SevenSegment.SevenSegment(address=0x70)
 seven_segment_display_1.begin()
 #3 seven segment displays
-seven_segment_display_2 = SevenSegment.SevenSegment(address=0x72)
+seven_segment_display_2 = SevenSegment.SevenSegment(address=0x71)
 seven_segment_display_2.begin()
 '''
 seven_segment_display_3 = SevenSegment.SevenSegment(address=0x50)
