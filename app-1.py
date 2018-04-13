@@ -535,12 +535,13 @@ class StevensBajaSAE(tk.Frame):
 		#data in the form of:rpm, speed,temp_1,temp_2
 		
 		data_parsed = [x for x in data.split(',')] #split by comma
+		print(data_parsed)
 		self.rpm = float(data_parsed[0][2:]) #for rpm dial
 		self.speed = float(data_parsed[1]) #for speedometer mph
 		self.temp_1 = float(data_parsed[2]) #temp for engine
 		self.temp_2 = float(data_parsed[3][:4]) #temp for engine perimeter
-		self.latitude = float(data_parsed[4])
-		self.longitude = float(data_parsed[5])
+		self.latitude = data_parsed[4]
+		self.longitude = data_parsed[5]
 		self.altitude = float(data_parsed[6])
 
 		#add data to the labels:
